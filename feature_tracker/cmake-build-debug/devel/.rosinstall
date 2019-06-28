@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/leo/catkin_ws2/src/VINS-Mono-Learning/feature_tracker/cmake-build-debug/devel/setup.sh
