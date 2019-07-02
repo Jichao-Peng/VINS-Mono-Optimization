@@ -7,4 +7,5 @@ add_library(edge_finder
         sspace.cpp
         iigauss.cpp
         iimage.cpp
-        VideoLib/video_io.cpp)
+        VideoLib/video_io.cpp
+        )

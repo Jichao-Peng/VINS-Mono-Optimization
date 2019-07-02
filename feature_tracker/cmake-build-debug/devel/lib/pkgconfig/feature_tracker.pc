@@ -1,8 +1,0 @@
-prefix=/home/leo/catkin_ws2/src/VINS-Mono-Learning/feature_tracker/cmake-build-debug/devel
-
-Name: feature_tracker
-Description: Description of feature_tracker
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/leo/catkin_ws2/src/VINS-Mono-Learning/feature_tracker/cmake-build-debug/devel/lib 
-Requires: 
