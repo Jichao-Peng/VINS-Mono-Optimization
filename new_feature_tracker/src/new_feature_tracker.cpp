@@ -61,7 +61,7 @@ void FeatureTracker::readImage(sensor_msgs::ImageConstPtr img_msg)
     {
         //TODO:源代码在这里进行了点的筛选，算法可以改进
         cout<<"the size of points BEFORE reject with F: "<<forw_pts.size()<<endl;
-        rejectWithF();
+        //rejectWithF();
         cout<<"the size of points AFTER reject with F: "<<forw_pts.size()<<endl<<endl;
 
         int n_max_cnt = MAX_CNT- static_cast<int>(forw_pts.size());//如果有达到最大点数就不需要再提取新的关键点

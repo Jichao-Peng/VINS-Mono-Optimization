@@ -1,0 +1,76 @@
+# StVO-PL options
+# -----------------------------------------------------------------------------------------------------
+has_points         : true      # true if using points
+has_lines          : true      # true if using line segments
+use_fld_lines      : false     # true if using FLD detector
+lr_in_parallel     : true      # true if detecting and matching features in parallel
+pl_in_parallel     : true      # true if detecting points and line segments in parallel
+best_lr_matches    : true      # true if double-checking the matches between the two images
+adaptative_fast    : true      # true if using adaptative fast_threshold
+use_motion_model   : false     # true if using constant motion model
+#TODO: adaptative fld threshold
+
+# Tracking parameters
+# -----------------------------------------------------------------------------------------------------
+# Point features
+max_dist_epip     : 0.0        # max. epipolar distance in pixels
+min_disp          : 1.0        # min. disparity (avoid points in the infinite)
+min_ratio_12_p    : 0.75       # min. ratio between the first and second best matches
+
+# Line segment features
+line_sim_th       : 0.75       # threshold for cosine similarity
+stereo_overlap_th : 0.75
+f2f_overlap_th    : 0.75
+min_line_length   : 0.025       # min. line length (relative to img size)
+line_horiz_th     : 0.1        # parameter to avoid horizontal lines (pixels)
+min_ratio_12_l    : 0.75       # parameter to avoid outliers in line matching
+ls_min_disp_ratio : 0.7        # min ratio between min(disp)/max(disp) for a LS
+
+# Adaptative FAST parameters
+fast_min_th       : 5          # min. value for FAST threshold
+fast_max_th       : 50         # max. value for FAST threshold
+fast_inc_th       : 5          # base increment for the FAST threshold
+fast_feat_th      : 50         # base number of features to increase/decrease FAST threshold
+fast_err_th       : 0.5        # threshold for the optimization error
+
+# TODO: add similar adaptative FAST for FLD (take care with the min and max values regarding performance)
+
+# RGB-D features
+rgbd_min_depth    : 0.5
+rgbd_max_depth    : 3.0
+
+# Optimization parameters
+# -----------------------------------------------------------------------------------------------------
+homog_th         : 1e-7        # avoid points in the infinite
+min_features     : 10          # min. number of features to perform StVO
+max_iters        : 5           # max. number of iterations in the first stage of the optimization
+max_iters_ref    : 10          # max. number of iterations in the refinement stage
+min_error        : 1e-7        # min. error to stop the optimization
+min_error_change : 1e-7        # min. error change to stop the optimization
+inlier_k         : 4.0         # factor to discard outliers before the refinement stage
+
+# Feature detection parameters
+# -----------------------------------------------------------------------------------------------------
+matching_stereo   : 0          # 0 - pure descriptor based  |  1 - window based plus descriptor
+matching_s_ws     : 10         # size of the windows (in pixels) to look for stereo matches (if matching_stereo=1)
+matching_f2f_ws   : 3          # size of the windows (in pixels) to look for f2f matches
+
+# ORB detector
+orb_nfeatures    : 1200        # number of ORB features to detect
+orb_scale_factor : 1.2         # pyramid decimation ratio for the ORB detector
+orb_nlevels      : 4           # number of pyramid levels
+orb_edge_th      : 19          # size of the border where the features are not detected
+orb_wta_k        : 2           #  number of points that produce each element of the oriented BRIEF descriptor 
+orb_score        : 1           # 0 - HARRIS  |  1 - FAST
+orb_patch_size   : 31          # size of the patch used by the oriented BRIEF descriptor.
+orb_fast_th      : 20          # default FAST threshold
+# LSD parameters
+lsd_nfeatures    : 300         # number of LSD lines detected (set to 0 if keeping all lines)
+lsd_refine       : 0           # the way of refining or not the detected lines
+lsd_scale        : 1.2         # scale of the image that will be used to find the lines
+lsd_sigma_scale  : 0.6         # sigma for Gaussian filter
+lsd_quant        : 2.0         # bound to the quantization error on the gradient norm
+lsd_ang_th       : 22.5        # gradient angle tolerance in degrees
+lsd_log_eps      : 1.0         # detection threshold (only for advanced refinement)
+lsd_density_th   : 0.6         # minimal density of aligned region points in the enclosing rectangle
+lsd_n_bins       : 1024        # number of bins in pseudo-ordering of gradient modulus
