@@ -12,8 +12,7 @@
 class IMUFactor : public ceres::SizedCostFunction<15, 7, 9, 7, 9>
 {
   public:
-    IMUFactor() = delete;
-    IMUFactor(IntegrationBase* _pre_integration):pre_integration(_pre_integration)
+    IMUFactor() = delete;IMUFactor(IntegrationBase* _pre_integration):pre_integration(_pre_integration)
     {
     }
     //IMU对应的残差，需要自己计算jacobian
@@ -58,7 +57,7 @@ class IMUFactor : public ceres::SizedCostFunction<15, 7, 9, 7, 9>
         }
 #endif
 
-        Eigen::Map<Eigen::Matrix<double, 15, 1>> residual(residuals);
+        Eigen::Map<Eigen::Matrix<double, 15, 1>> residual(residuals);//计算参差
         residual = pre_integration->evaluate(Pi, Qi, Vi, Bai, Bgi,
                                             Pj, Qj, Vj, Baj, Bgj);
 

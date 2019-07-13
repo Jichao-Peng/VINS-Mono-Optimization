@@ -800,14 +800,14 @@ void Estimator::optimization()
     ceres::Problem problem;
     ceres::LossFunction *loss_function;
     //loss_function = new ceres::HuberLoss(1.0);
-    loss_function = new ceres::CauchyLoss(1.0);
+    loss_function = new ceres::CauchyLoss(1.0);//couchy核函数
     
     //添加ceres参数块
     //因为ceres用的是double数组，所以在下面用vector2double做类型装换
     //Ps、Rs转变成para_Pose，Vs、Bas、Bgs转变成para_SpeedBias
-    for (int i = 0; i < WINDOW_SIZE + 1; i++)
+    for (int i = 0; i < WINDOW_SIZE + 1; i++)//添加所有的优化变量
     {
-        ceres::LocalParameterization *local_parameterization = new PoseLocalParameterization();
+        ceres::LocalParameterization *local_parameterization = new PoseLocalParameterization();//这个参数是告诉求解器这个是个单元四元数
         problem.AddParameterBlock(para_Pose[i], SIZE_POSE, local_parameterization);
         problem.AddParameterBlock(para_SpeedBias[i], SIZE_SPEEDBIAS);
     }
@@ -834,7 +834,7 @@ void Estimator::optimization()
 
     TicToc t_whole, t_prepare;
 
-    vector2double();
+    vector2double();//将所有的优化参数转成数据形式，ceres要求
 
     //添加边缘化残差
     if (last_marginalization_info)
@@ -851,14 +851,14 @@ void Estimator::optimization()
         int j = i + 1;
         if (pre_integrations[j]->sum_dt > 10.0)
             continue;
-        IMUFactor* imu_factor = new IMUFactor(pre_integrations[j]);
-        problem.AddResidualBlock(imu_factor, NULL, para_Pose[i], para_SpeedBias[i], para_Pose[j], para_SpeedBias[j]);
+        IMUFactor* imu_factor = new IMUFactor(pre_integrations[j]);//这里面会计算残差以及残差对优化变量雅克比矩阵
+        problem.AddResidualBlock(imu_factor, NULL, para_Pose[i], para_SpeedBias[i], para_Pose[j], para_SpeedBias[j]);//这里指定了相关的优化变量
     }
     int f_m_cnt = 0;
     int feature_index = -1;
 
     //添加视觉残差
-    for (auto &it_per_id : f_manager.feature)
+    for (auto &it_per_id : f_manager.feature)//遍历滑窗内所有的空间点
     {
         it_per_id.used_num = it_per_id.feature_per_frame.size();
         if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))
@@ -870,7 +870,7 @@ void Estimator::optimization()
         
         Vector3d pts_i = it_per_id.feature_per_frame[0].point;
 
-        for (auto &it_per_frame : it_per_id.feature_per_frame)
+        for (auto &it_per_frame : it_per_id.feature_per_frame)//遍历空间点在所有可观测的图像帧上的像素点
         {
             imu_j++;
             if (imu_i == imu_j)
@@ -878,7 +878,7 @@ void Estimator::optimization()
                 continue;
             }
             Vector3d pts_j = it_per_frame.point;
-            if (ESTIMATE_TD)
+            if (ESTIMATE_TD)//是否估计时间同步
             {
                     ProjectionTdFactor *f_td = new ProjectionTdFactor(pts_i, pts_j, it_per_id.feature_per_frame[0].velocity, it_per_frame.velocity,
                                                                      it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td,
@@ -896,8 +896,8 @@ void Estimator::optimization()
             }
             else
             {
-                ProjectionFactor *f = new ProjectionFactor(pts_i, pts_j);
-                problem.AddResidualBlock(f, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index]);
+                ProjectionFactor *f = new ProjectionFactor(pts_i, pts_j);//这里面会计算残差以及残差对优化变量雅克比矩阵
+                problem.AddResidualBlock(f, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index]);//这里指定了相关的优化变量
             }
             f_m_cnt++;
         }
@@ -979,10 +979,10 @@ void Estimator::optimization()
         if (last_marginalization_info)
         {
             vector<int> drop_set;
-            for (int i = 0; i < static_cast<int>(last_marginalization_parameter_blocks.size()); i++)
+            for (int i = 0; i < static_cast<int>(last_marginalization_parameter_blocks.size()); i++)//last_marginalization_parameter_blocks是上一轮留下来的残差块
             {
                 if (last_marginalization_parameter_blocks[i] == para_Pose[0] ||
-                    last_marginalization_parameter_blocks[i] == para_SpeedBias[0])
+                    last_marginalization_parameter_blocks[i] == para_SpeedBias[0])//需要marg掉的优化变量，也就是滑窗内第一个变量
                     drop_set.push_back(i);
             }
             // construct new marginlization_factor
@@ -1000,8 +1000,8 @@ void Estimator::optimization()
             {
                 IMUFactor* imu_factor = new IMUFactor(pre_integrations[1]);
                 ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(imu_factor, NULL,
-                                                                           vector<double *>{para_Pose[0], para_SpeedBias[0], para_Pose[1], para_SpeedBias[1]},
-                                                                           vector<int>{0, 1});
+                                                                           vector<double *>{para_Pose[0], para_SpeedBias[0], para_Pose[1], para_SpeedBias[1]},//优化变量
+                                                                           vector<int>{0, 1});//这里是0,1的原因是0和1是para_Pose[0], para_SpeedBias[0]是需要marg的变量
                 marginalization_info->addResidualBlockInfo(residual_block_info);
             }
         }
@@ -1011,14 +1011,14 @@ void Estimator::optimization()
             int feature_index = -1;
             for (auto &it_per_id : f_manager.feature)
             {
-                it_per_id.used_num = it_per_id.feature_per_frame.size();
+                it_per_id.used_num = it_per_id.feature_per_frame.size();//这里是遍历滑窗所有的特征点
                 if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))
                     continue;
 
                 ++feature_index;
 
-                int imu_i = it_per_id.start_frame, imu_j = imu_i - 1;
-                if (imu_i != 0)
+                int imu_i = it_per_id.start_frame, imu_j = imu_i - 1;//这里是从特征点的第一个观察帧开始
+                if (imu_i != 0)//如果第一个观察帧不是第一帧就不进行考虑，因此后面用来构建marg矩阵的都是和第一帧有共视关系的滑窗帧
                     continue;
 
                 Vector3d pts_i = it_per_id.feature_per_frame[0].point;
@@ -1036,7 +1036,7 @@ void Estimator::optimization()
                                                                           it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td,
                                                                           it_per_id.feature_per_frame[0].uv.y(), it_per_frame.uv.y());
                         ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(f_td, loss_function,
-                                                                                        vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0]},
+                                                                                        vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0]},//优化变量
                                                                                         vector<int>{0, 3});
                         marginalization_info->addResidualBlockInfo(residual_block_info);
                     }
@@ -1044,8 +1044,8 @@ void Estimator::optimization()
                     {
                         ProjectionFactor *f = new ProjectionFactor(pts_i, pts_j);
                         ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(f, loss_function,
-                                                                                       vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index]},
-                                                                                       vector<int>{0, 3});
+                                                                                       vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index]},//优化变量
+                                                                                       vector<int>{0, 3});//为0和3的原因是，para_Pose[imu_i]是第一帧的位姿，需要marg掉，而3是para_Feature[feature_index]是和第一帧相关的特征点，需要marg掉
                         marginalization_info->addResidualBlockInfo(residual_block_info);
                     }
                 }
@@ -1067,9 +1067,9 @@ void Estimator::optimization()
 
         //6.调整参数块在下一次窗口中对应的位置（往前移一格），注意这里是指针，后面slideWindow中会赋新值，这里只是提前占座
         std::unordered_map<long, double *> addr_shift;
-        for (int i = 1; i <= WINDOW_SIZE; i++)
+        for (int i = 1; i <= WINDOW_SIZE; i++)//从1开始，因为第一帧的状态不要了
         {
-            addr_shift[reinterpret_cast<long>(para_Pose[i])] = para_Pose[i - 1];
+            addr_shift[reinterpret_cast<long>(para_Pose[i])] = para_Pose[i - 1];//因此para_Pose这些变量都是双指针变量，因此这一步是指针操作
             addr_shift[reinterpret_cast<long>(para_SpeedBias[i])] = para_SpeedBias[i - 1];
         }
         for (int i = 0; i < NUM_OF_CAM; i++)
@@ -1081,9 +1081,9 @@ void Estimator::optimization()
         vector<double *> parameter_blocks = marginalization_info->getParameterBlocks(addr_shift);
 
         if (last_marginalization_info)
-            delete last_marginalization_info;
-        last_marginalization_info = marginalization_info;
-        last_marginalization_parameter_blocks = parameter_blocks;
+            delete last_marginalization_info;//删除掉上一次的marg相关的内容
+        last_marginalization_info = marginalization_info;//marg相关内容的递归
+        last_marginalization_parameter_blocks = parameter_blocks;//优化变量的递归
         
     }
 

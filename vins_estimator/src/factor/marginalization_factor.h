@@ -24,6 +24,7 @@ struct ResidualBlockInfo
     std::vector<double *> parameter_blocks;//优化变量数据
     std::vector<int> drop_set;//待边缘化的优化变量id
 
+    //雅克比矩阵
     double **raw_jacobians;
     std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> jacobians;
     Eigen::VectorXd residuals;//残差 IMU:15X1 视觉2X1
@@ -39,7 +40,7 @@ struct ThreadsStruct
     std::vector<ResidualBlockInfo *> sub_factors;
     Eigen::MatrixXd A;
     Eigen::VectorXd b;
-    std::unordered_map<long, int> parameter_block_size; //global size
+    std::unordered_map<long, int> parameter_block_size; //每个优化变量块的变量大小，以ＩＭＵ为例，为[７，９，７，９]
     std::unordered_map<long, int> parameter_block_idx; //local size
 };
 
@@ -49,8 +50,11 @@ class MarginalizationInfo
     ~MarginalizationInfo();
     int localSize(int size) const;
     int globalSize(int size) const;
+    //添加参差块相关信息（优化变量，待marg的变量）
     void addResidualBlockInfo(ResidualBlockInfo *residual_block_info);
+    //计算每个残差对应的雅克比，并更新parameter_block_data
     void preMarginalize();
+    //pos为所有变量维度，ｍ为需要marg掉的变量，ｎ为需要保留的变量
     void marginalize();
     std::vector<double *> getParameterBlocks(std::unordered_map<long, double *> &addr_shift);
 
@@ -58,7 +62,7 @@ class MarginalizationInfo
     int m, n;//m为要边缘化的变量个数，n为要保留下来的变量个数
     std::unordered_map<long, int> parameter_block_size; //<优化变量内存地址,localSize>
     int sum_block_size;
-    std::unordered_map<long, int> parameter_block_idx; //<待边缘化的优化变量内存地址,在parameter_block_size中的id>
+    std::unordered_map<long, int> parameter_block_idx; //<优化变量内存地址,在矩阵中的id>
     std::unordered_map<long, double *> parameter_block_data;//<优化变量内存地址,数据>
 
     std::vector<int> keep_block_size; //global size

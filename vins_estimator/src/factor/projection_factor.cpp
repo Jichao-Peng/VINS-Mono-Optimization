@@ -48,7 +48,7 @@ bool ProjectionFactor::Evaluate(double const *const *parameters, double *residua
     residual =  tangent_base * (pts_camera_j.normalized() - pts_j.normalized());
 #else
     double dep_j = pts_camera_j.z();
-    residual = (pts_camera_j / dep_j).head<2>() - pts_j.head<2>();
+    residual = (pts_camera_j / dep_j).head<2>() - pts_j.head<2>();//计算参差
 #endif
 
     residual = sqrt_info * residual;
