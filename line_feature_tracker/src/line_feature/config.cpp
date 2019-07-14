@@ -33,6 +33,7 @@
 
 using namespace std;
 
+//和直线提取相关的参数都在这里设置
 Config::Config()
 {
 
@@ -119,88 +120,3 @@ Config& Config::getInstance()
     static Config instance; // Instantiated on first use and guaranteed to be destroyed
     return instance;
 }
-
-//template<typename T>
-//inline T loadSafe(const YAML::Node &config, std::string param, T default_value = T()) {
-//
-//    if (YAML::Node parameter = config[param])
-//        return parameter.as<T>();
-//    else
-//        return default_value;
-//}
-//
-//void Config::loadFromFile( const string &config_file )
-//{
-//
-//    if (!boost::filesystem::exists(config_file) || !boost::filesystem::is_regular(config_file)) {
-//        cout << "[Config->loadFromFile] Invalid config file, keeping default params..." << endl;
-//        return;
-//    }
-//
-//    YAML::Node config = YAML::LoadFile(config_file);
-//
-//    Config::minEntropyRatio() = loadSafe(config, "min_entropy_ratio", Config::minEntropyRatio());
-//    Config::maxKFTDist() = loadSafe(config, "max_kf_t_dist", Config::maxKFTDist());
-//    Config::maxKFRDist() = loadSafe(config, "max_kf_r_dist", Config::maxKFRDist());
-//
-//    Config::hasPoints() = loadSafe(config, "has_points", Config::hasPoints());
-//    Config::hasLines() = loadSafe(config, "has_lines", Config::hasLines());
-//    Config::useFLDLines() = loadSafe(config, "use_fld_lines", Config::useFLDLines());
-//    Config::lrInParallel() = loadSafe(config, "lr_in_parallel", Config::lrInParallel());
-//    Config::plInParallel() = loadSafe(config, "pl_in_parallel", Config::plInParallel());
-//    Config::bestLRMatches() = loadSafe(config, "best_lr_matches", Config::bestLRMatches());
-//    Config::adaptativeFAST() = loadSafe(config, "adaptative_fast", Config::adaptativeFAST());
-//    Config::useMotionModel() = loadSafe(config, "use_motion_model", Config::useMotionModel());
-//
-//    Config::maxDistEpip() = loadSafe(config, "max_dist_epip", Config::maxDistEpip());
-//    Config::minDisp() = loadSafe(config, "min_disp", Config::minDisp());
-//    Config::minRatio12P() = loadSafe(config, "min_ratio_12_p", Config::minRatio12P());
-//
-//    Config::lineSimTh() = loadSafe(config, "line_sim_th", Config::lineSimTh());
-//    Config::stereoOverlapTh() = loadSafe(config, "stereo_overlap_th", Config::stereoOverlapTh());
-//    Config::f2fOverlapTh() = loadSafe(config, "f2f_overlap_th", Config::f2fOverlapTh());
-//    Config::minLineLength() = loadSafe(config, "min_line_length", Config::minLineLength());
-//    Config::lineHorizTh() = loadSafe(config, "line_horiz_th", Config::lineHorizTh());
-//    Config::minRatio12L() = loadSafe(config, "min_ratio_12_l", Config::minRatio12L());
-//    Config::lsMinDispRatio() = loadSafe(config, "ls_min_disp_ratio", Config::lsMinDispRatio());
-//
-//    Config::fastMinTh() = loadSafe(config, "fast_min_th", Config::fastMinTh());
-//    Config::fastMaxTh() = loadSafe(config, "fast_max_th", Config::fastMaxTh());
-//    Config::fastIncTh() = loadSafe(config, "fast_inc_th", Config::fastIncTh());
-//    Config::fastFeatTh() = loadSafe(config, "fast_feat_th", Config::fastFeatTh());
-//    Config::fastErrTh() = loadSafe(config, "fast_err_th", Config::fastErrTh());
-//
-//    Config::rgbdMinDepth() = loadSafe(config, "rgbd_min_depth", Config::rgbdMinDepth());
-//    Config::rgbdMaxDepth() = loadSafe(config, "rgbd_max_depth", Config::rgbdMaxDepth());
-//
-//    Config::homogTh() = loadSafe(config, "homog_th", Config::homogTh());
-//    Config::minFeatures() = loadSafe(config, "min_features", Config::minFeatures());
-//    Config::maxIters() = loadSafe(config, "max_iters", Config::maxIters());
-//    Config::maxItersRef() = loadSafe(config, "max_iters_ref", Config::maxItersRef());
-//    Config::minError() = loadSafe(config, "min_error", Config::minError());
-//    Config::minErrorChange() = loadSafe(config, "min_error_change", Config::minErrorChange());
-//    Config::inlierK() = loadSafe(config, "inlier_k", Config::inlierK());
-//
-//    Config::matchingStrategy() = loadSafe(config, "matching_strategy", Config::matchingStrategy());
-//    Config::matchingSWs() = loadSafe(config, "matching_s_ws", Config::matchingSWs());
-//    Config::matchingF2FWs() = loadSafe(config, "matching_f2f_ws", Config::matchingF2FWs());
-//
-//    Config::orbNFeatures() = loadSafe(config, "orb_nfeatures", Config::orbNFeatures());
-//    Config::orbScaleFactor() = loadSafe(config, "orb_scale_factor", Config::orbScaleFactor());
-//    Config::orbNLevels() = loadSafe(config, "orb_nlevels", Config::orbNLevels());
-//    Config::orbEdgeTh() = loadSafe(config, "orb_edge_th", Config::orbEdgeTh());
-//    Config::orbWtaK() = loadSafe(config, "orb_wta_k", Config::orbWtaK());
-//    Config::orbScore() = loadSafe(config, "orb_score", Config::orbScore());
-//    Config::orbPatchSize() = loadSafe(config, "orb_patch_size", Config::orbPatchSize());
-//    Config::orbFastTh() = loadSafe(config, "orb_fast_th", Config::orbFastTh());
-//
-//    Config::lsdNFeatures() = loadSafe(config, "lsd_nfeatures", Config::lsdNFeatures());
-//    Config::lsdRefine() = loadSafe(config, "lsd_refine", Config::lsdRefine());
-//    Config::lsdScale() = loadSafe(config, "lsd_scale", Config::lsdScale());
-//    Config::lsdSigmaScale() = loadSafe(config, "lsd_sigma_scale", Config::lsdSigmaScale());
-//    Config::lsdQuant() = loadSafe(config, "lsd_quant", Config::lsdQuant());
-//    Config::lsdAngTh() = loadSafe(config, "lsd_ang_th", Config::lsdAngTh());
-//    Config::lsdLogEps() = loadSafe(config, "lsd_log_eps", Config::lsdLogEps());
-//    Config::lsdDensityTh() = loadSafe(config, "lsd_density_th", Config::lsdDensityTh());
-//    Config::lsdNBins() = loadSafe(config, "lsd_n_bins", Config::lsdNBins());
-//}

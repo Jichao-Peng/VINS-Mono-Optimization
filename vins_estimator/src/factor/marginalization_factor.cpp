@@ -317,10 +317,10 @@ std::vector<double *> MarginalizationInfo::getParameterBlocks(std::unordered_map
     {
         if (it.second >= m)//没有被marg掉剩下的优化变量相关的内容
         {
-            keep_block_size.push_back(parameter_block_size[it.first]);//参差块的大小
-            keep_block_idx.push_back(parameter_block_idx[it.first]);//参差块在矩阵中的id
-            keep_block_data.push_back(parameter_block_data[it.first]);//参差块的数据
-            keep_block_addr.push_back(addr_shift[it.first]);
+            keep_block_size.push_back(parameter_block_size[it.first]);//优化变量的localsize
+            keep_block_idx.push_back(parameter_block_idx[it.first]);//优化变量在矩阵中的id
+            keep_block_data.push_back(parameter_block_data[it.first]);//优化变量的数据
+            keep_block_addr.push_back(addr_shift[it.first]);//优化变量的指针，这些指针会从滑窗内第一个优化变量（para_Pose和para_SpeedBias）开始，已知指到倒数第二个，通过slideWindow函数才会把内容进行更换
         }
     }
     sum_block_size = std::accumulate(std::begin(keep_block_size), std::end(keep_block_size), 0);

@@ -1069,6 +1069,7 @@ void Estimator::optimization()
         std::unordered_map<long, double *> addr_shift;
         for (int i = 1; i <= WINDOW_SIZE; i++)//从1开始，因为第一帧的状态不要了
         {
+            //这一步的操作指的是第i的位置存放的的是i-1的内容，这就意味着窗口向前移动了一格
             addr_shift[reinterpret_cast<long>(para_Pose[i])] = para_Pose[i - 1];//因此para_Pose这些变量都是双指针变量，因此这一步是指针操作
             addr_shift[reinterpret_cast<long>(para_SpeedBias[i])] = para_SpeedBias[i - 1];
         }
@@ -1083,7 +1084,7 @@ void Estimator::optimization()
         if (last_marginalization_info)
             delete last_marginalization_info;//删除掉上一次的marg相关的内容
         last_marginalization_info = marginalization_info;//marg相关内容的递归
-        last_marginalization_parameter_blocks = parameter_blocks;//优化变量的递归
+        last_marginalization_parameter_blocks = parameter_blocks;//优化变量的递归，这里面仅仅是指针
         
     }
 
@@ -1193,7 +1194,7 @@ void Estimator::slideWindow()
                 Vs[i].swap(Vs[i + 1]);
                 Bas[i].swap(Bas[i + 1]);
                 Bgs[i].swap(Bgs[i + 1]);
-            }
+            }//将所有的值都和转移到前一帧的值上面去
 
             Headers[WINDOW_SIZE] = Headers[WINDOW_SIZE - 1];
             Ps[WINDOW_SIZE] = Ps[WINDOW_SIZE - 1];
@@ -1282,7 +1283,7 @@ void Estimator::slideWindowOld()
         R1 = Rs[0] * ric[0];
         P0 = back_P0 + back_R0 * tic[0];
         P1 = Ps[0] + Rs[0] * tic[0];
-        f_manager.removeBackShiftDepth(R0, P0, R1, P1);
+        f_manager.removeBackShiftDepth(R0, P0, R1, P1);//如果这个特征点的开始帧不是最老帧，则特征点所有帧数减一，如果是，则通过三维变换变换到下一帧上去
     }
     else
         f_manager.removeBack();

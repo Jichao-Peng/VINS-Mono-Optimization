@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         std_msgs
         Eigen3
+        camera_model
 )
 
 catkin_package()
@@ -21,8 +22,15 @@ include_directories(
 
 add_executable(line_feature_tracker
         src/feature_traker_node.cpp
-        src/config.cpp
-        src/auxiliar.cpp)
+        src/feature_tracker.cpp
+        src/parameters.cpp
+
+        src/line_feature/line_feature.cpp
+        src/line_feature/config.cpp
+        src/line_feature/auxiliar.cpp
+        src/line_feature/matching.cpp
+        src/line_feature/lineIterator.cpp
+        src/line_feature/gridStructure.cpp)
 
 target_link_libraries(line_feature_tracker
         ${catkin_LIBRARIES}
