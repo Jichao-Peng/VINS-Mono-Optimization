@@ -14,6 +14,17 @@ bool inBorder(const cv::Point2f &pt)
     return BORDER_SIZE <= img_x && img_x < COL - BORDER_SIZE && BORDER_SIZE <= img_y && img_y < ROW - BORDER_SIZE;
 }
 
+bool inBorder(const cv::line_descriptor::KeyLine &line)
+{
+    const int BORDER_SIZE = 2;
+    int start_x = cvRound(line.startPointX);
+    int start_y = cvRound(line.startPointY);
+    int end_x = cvRound(line.endPointX);
+    int end_y = cvRound(line.endPointY);
+    return (BORDER_SIZE <= start_x && start_x < COL - BORDER_SIZE && BORDER_SIZE <= start_y && start_y < ROW - BORDER_SIZE) ||
+            (BORDER_SIZE <= end_x && end_x < COL - BORDER_SIZE && BORDER_SIZE <= end_y && end_y < ROW - BORDER_SIZE);
+}
+
 //去除无法跟踪的特征点
 void reduceVector(vector<cv::Point2f> &v, vector<uchar> status)
 {
@@ -203,6 +214,7 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
 
     //-------------------------------------上面是和点相关的数据处理----------------------------------------
 
+
     //不管怎样，都要检测下一帧的线段,然后进行匹配，相当于追踪
     m_line_feature.detectLineFeatures(forw_img, forw_lines, forw_ldesc, forw_min_length);
 
@@ -210,6 +222,14 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
     {
         vector<int> matches;
         m_line_feature.matchLineFeatures(cur_ldesc, forw_ldesc, matches);//matches的下标为前一帧匹配线，matches的下表对应的值为后一帧的匹配线
+
+        for(int i = 0; i<cur_lines.size(); i++)
+        {
+            if(!inBorder(cur_lines[i]))
+            {
+                matches[i] = -1;
+            }
+        }
 
         vector<int> line_ids_temp(forw_lines.size(),-1);
         vector<int> line_track_cnt_temp(forw_lines.size(),0);

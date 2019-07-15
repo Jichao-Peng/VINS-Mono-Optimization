@@ -75,6 +75,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     else
         PUB_THIS_FRAME = false;
 
+
     //-------------------------------------上面仅仅和时间有关，下面才开始处理数据----------------------------------------
 
 
@@ -138,7 +139,6 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     //-------------------------------------上面处理完成，下面仅仅是进行发布操作----------------------------------------
 
 
-
     //1、将特征点id，矫正后归一化平面的3D点(x,y,z=1)，像素2D点(u,v)，像素的速度(vx,vy),发布到pub_img;
     //2、将图像封装到cv_bridge::cvtColor类型的ptr实例中发布到pub_match
     if (PUB_THIS_FRAME)
@@ -150,6 +150,12 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
         sensor_msgs::ChannelFloat32 v_of_point;
         sensor_msgs::ChannelFloat32 velocity_x_of_point;
         sensor_msgs::ChannelFloat32 velocity_y_of_point;
+
+        sensor_msgs::ChannelFloat32 id_of_line;
+        sensor_msgs::ChannelFloat32 start_x_of_line;
+        sensor_msgs::ChannelFloat32 start_y_of_line;
+        sensor_msgs::ChannelFloat32 end_x_of_line;
+        sensor_msgs::ChannelFloat32 end_y_of_line;
 
         feature_points->header = img_msg->header;
         feature_points->header.frame_id = "world";
@@ -181,6 +187,22 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                     velocity_y_of_point.values.push_back(pts_velocity[j].y);
                 }
             }
+
+            auto &line_ids = trackerData[i].line_ids;
+            auto &lines = trackerData[i].cur_lines;
+            for(unsigned int j = 0; j < line_ids.size(); j++)
+            {
+                if(trackerData[i].line_track_cnt[j] > 1)
+                {
+                    int p_line_id = line_ids[j];
+                    id_of_line.values.push_back(p_line_id * NUM_OF_CAM + i);
+                    start_x_of_line.values.push_back(lines[j].startPointX);
+                    start_y_of_line.values.push_back(lines[j].startPointY);
+                    end_x_of_line.values.push_back(lines[j].endPointX);
+                    end_y_of_line.values.push_back(lines[j].endPointY);
+                }
+            }
+
         }
         //不同的通道存储不同的特征
         feature_points->channels.push_back(id_of_point);
@@ -188,6 +210,13 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
         feature_points->channels.push_back(v_of_point);
         feature_points->channels.push_back(velocity_x_of_point);
         feature_points->channels.push_back(velocity_y_of_point);
+
+        feature_points->channels.push_back(id_of_line);
+        feature_points->channels.push_back(start_x_of_line);
+        feature_points->channels.push_back(start_y_of_line);
+        feature_points->channels.push_back(end_x_of_line);
+        feature_points->channels.push_back(end_y_of_line);
+        cout<<"the num of line is "<<feature_points->channels[5].values.size()<<endl;
         ROS_DEBUG("publish %f, at %f", feature_points->header.stamp.toSec(), ros::Time::now().toSec());
 
         // skip the first image; since no optical speed on frist image
@@ -200,6 +229,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
 
 
         //-------------------------------------上面是发布操作，下面仅仅是显示图片----------------------------------------
+
 
         if (SHOW_TRACK)
         {
@@ -225,6 +255,16 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                     trackerData[i].m_camera->spaceToPlane(tmp_prev_un_pts, tmp_prev_uv);
                     cv::line(tmp_img, trackerData[i].cur_pts[j], cv::Point2f(tmp_prev_uv.x(), tmp_prev_uv.y()), cv::Scalar(255 , 0, 0), 1 , 8, 0);
                 }
+
+                for(unsigned int j = 0; j < trackerData[i].cur_lines.size(); j++)
+                {
+                    double len = std::min(1.0, 1.0 * trackerData[i].line_track_cnt[j] / WINDOW_SIZE);
+                    cv::line(tmp_img,
+                             Point(trackerData[i].cur_lines[j].startPointX, trackerData[i].cur_lines[j].startPointY),
+                             Point(trackerData[i].cur_lines[j].endPointX, trackerData[i].cur_lines[j].endPointY),
+                             Scalar(255*(1-len),0,255*len),2);
+                }
+
             }
             cv::imshow("vis", stereo_img);
             cv::waitKey(1);

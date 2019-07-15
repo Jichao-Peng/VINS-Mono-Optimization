@@ -22,6 +22,7 @@ using namespace camodocal;
 using namespace Eigen;
 
 bool inBorder(const cv::Point2f &pt);
+bool inBorder(const cv::line_descriptor::KeyLine &line);
 
 void reduceVector(vector<cv::Point2f> &v, vector<uchar> status);
 void reduceVector(vector<int> &v, vector<uchar> status);
@@ -92,7 +93,4 @@ class FeatureTracker
     static int n_line_id;
 
     double prev_min_length, cur_min_length, forw_min_length;
-
-    void reduceLineVector(vector<cv::line_descriptor::KeyLine>& v, vector<int> matches);
-    void reduceLineVector(vector<int>& v, vector<int> matches);
 };

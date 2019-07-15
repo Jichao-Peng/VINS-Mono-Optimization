@@ -4,19 +4,19 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/build/CMakeFiles/3.5.1/CompilerIdCXX/CMakeCXXCompilerId.cpp" "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/CMakeFiles/3.5.1/CompilerIdCXX/CMakeCXXCompilerId.cpp.o"
-  "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/src/LSDDetector_custom.cpp" "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/LSDDetector_custom.cpp.o"
-  "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/src/binary_descriptor_custom.cpp" "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/binary_descriptor_custom.cpp.o"
-  "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/src/binary_descriptor_matcher.cpp" "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/binary_descriptor_matcher.cpp.o"
-  "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/src/draw_custom.cpp" "/home/leo/catkin_ws2/src/VINS-Mono-Learning/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/draw_custom.cpp.o"
+  "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/3.10.2/CompilerIdCXX/CMakeCXXCompilerId.cpp" "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/CMakeFiles/3.10.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.o"
+  "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/LSDDetector_custom.cpp" "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/LSDDetector_custom.cpp.o"
+  "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/binary_descriptor_custom.cpp" "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/binary_descriptor_custom.cpp.o"
+  "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/binary_descriptor_matcher.cpp" "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/binary_descriptor_matcher.cpp.o"
+  "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/draw_custom.cpp" "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/linedesc.dir/src/draw_custom.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../include"
-  "/opt/ros/kinetic/include/opencv-3.3.1-dev"
-  "/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv"
+  "/usr/local/include"
+  "/usr/local/include/opencv"
   )
 
 # Targets to which this target links.
