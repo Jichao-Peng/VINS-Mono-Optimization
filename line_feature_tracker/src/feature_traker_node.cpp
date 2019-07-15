@@ -188,6 +188,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                 }
             }
 
+            //线特征相关
             auto &line_ids = trackerData[i].line_ids;
             auto &lines = trackerData[i].cur_lines;
             for(unsigned int j = 0; j < line_ids.size(); j++)
