@@ -4,7 +4,7 @@
 
 #include "line_local_parameterization.h"
 
-//q1, q2, q3, q4, phi
+//x, y, z, w, phi
 bool LineLocalParameterization::Plus(const double *x, const double *delta, double *x_plus_delta) const
 {
     Eigen::Map<const Eigen::Quaterniond> _q(x);//U matrix

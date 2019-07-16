@@ -5,10 +5,9 @@
 #include <cstring>
 #include <eigen3/Eigen/Dense>
 
-class Utility
-{
-  public:
-    template <typename Derived>
+class Utility {
+public:
+    template<typename Derived>
     static Eigen::Quaternion<typename Derived::Scalar> deltaQ(const Eigen::MatrixBase<Derived> &theta)
     {
         typedef typename Derived::Scalar Scalar_t;
@@ -23,17 +22,17 @@ class Utility
         return dq;
     }
 
-    template <typename Derived>
+    template<typename Derived>
     static Eigen::Matrix<typename Derived::Scalar, 3, 3> skewSymmetric(const Eigen::MatrixBase<Derived> &q)
     {
         Eigen::Matrix<typename Derived::Scalar, 3, 3> ans;
         ans << typename Derived::Scalar(0), -q(2), q(1),
-            q(2), typename Derived::Scalar(0), -q(0),
-            -q(1), q(0), typename Derived::Scalar(0);
+                q(2), typename Derived::Scalar(0), -q(0),
+                -q(1), q(0), typename Derived::Scalar(0);
         return ans;
     }
 
-    template <typename Derived>
+    template<typename Derived>
     static Eigen::Quaternion<typename Derived::Scalar> positify(const Eigen::QuaternionBase<Derived> &q)
     {
         //printf("a: %f %f %f %f", q.w(), q.x(), q.y(), q.z());
@@ -43,23 +42,23 @@ class Utility
         return q;
     }
 
-    template <typename Derived>
+    template<typename Derived>
     static Eigen::Matrix<typename Derived::Scalar, 4, 4> Qleft(const Eigen::QuaternionBase<Derived> &q)
     {
         Eigen::Quaternion<typename Derived::Scalar> qq = positify(q);
         Eigen::Matrix<typename Derived::Scalar, 4, 4> ans;
         ans(0, 0) = qq.w(), ans.template block<1, 3>(0, 1) = -qq.vec().transpose();
-        ans.template block<3, 1>(1, 0) = qq.vec(), ans.template block<3, 3>(1, 1) = qq.w() * Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() + skewSymmetric(qq.vec());
+        ans.template block<3, 1>(1, 0) = qq.vec(), ans.template block<3, 3>(1, 1) = qq.w()*Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() + skewSymmetric(qq.vec());
         return ans;
     }
 
-    template <typename Derived>
+    template<typename Derived>
     static Eigen::Matrix<typename Derived::Scalar, 4, 4> Qright(const Eigen::QuaternionBase<Derived> &p)
     {
         Eigen::Quaternion<typename Derived::Scalar> pp = positify(p);
         Eigen::Matrix<typename Derived::Scalar, 4, 4> ans;
         ans(0, 0) = pp.w(), ans.template block<1, 3>(0, 1) = -pp.vec().transpose();
-        ans.template block<3, 1>(1, 0) = pp.vec(), ans.template block<3, 3>(1, 1) = pp.w() * Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() - skewSymmetric(pp.vec());
+        ans.template block<3, 1>(1, 0) = pp.vec(), ans.template block<3, 3>(1, 1) = pp.w()*Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() - skewSymmetric(pp.vec());
         return ans;
     }
 
@@ -71,70 +70,80 @@ class Utility
 
         Eigen::Vector3d ypr(3);
         double y = atan2(n(1), n(0));
-        double p = atan2(-n(2), n(0) * cos(y) + n(1) * sin(y));
-        double r = atan2(a(0) * sin(y) - a(1) * cos(y), -o(0) * sin(y) + o(1) * cos(y));
+        double p = atan2(-n(2), n(0)*cos(y) + n(1)*sin(y));
+        double r = atan2(a(0)*sin(y) - a(1)*cos(y), -o(0)*sin(y) + o(1)*cos(y));
         ypr(0) = y;
         ypr(1) = p;
         ypr(2) = r;
 
-        return ypr / M_PI * 180.0;
+        return ypr/M_PI*180.0;
     }
 
-    template <typename Derived>
+    template<typename Derived>
     static Eigen::Matrix<typename Derived::Scalar, 3, 3> ypr2R(const Eigen::MatrixBase<Derived> &ypr)
     {
         typedef typename Derived::Scalar Scalar_t;
 
-        Scalar_t y = ypr(0) / 180.0 * M_PI;
-        Scalar_t p = ypr(1) / 180.0 * M_PI;
-        Scalar_t r = ypr(2) / 180.0 * M_PI;
+        Scalar_t y = ypr(0)/180.0*M_PI;
+        Scalar_t p = ypr(1)/180.0*M_PI;
+        Scalar_t r = ypr(2)/180.0*M_PI;
 
         Eigen::Matrix<Scalar_t, 3, 3> Rz;
         Rz << cos(y), -sin(y), 0,
-            sin(y), cos(y), 0,
-            0, 0, 1;
+                sin(y), cos(y), 0,
+                0, 0, 1;
 
         Eigen::Matrix<Scalar_t, 3, 3> Ry;
         Ry << cos(p), 0., sin(p),
-            0., 1., 0.,
-            -sin(p), 0., cos(p);
+                0., 1., 0.,
+                -sin(p), 0., cos(p);
 
         Eigen::Matrix<Scalar_t, 3, 3> Rx;
         Rx << 1., 0., 0.,
-            0., cos(r), -sin(r),
-            0., sin(r), cos(r);
+                0., cos(r), -sin(r),
+                0., sin(r), cos(r);
 
-        return Rz * Ry * Rx;
+        return Rz*Ry*Rx;
     }
 
     static Eigen::Matrix3d g2R(const Eigen::Vector3d &g);
 
-    template <size_t N>
-    struct uint_
-    {
+    /// \brief 普吕克坐标和正交坐标之间的转换
+    ///
+    /// \param n pluker向量n=[x y z]^T
+    /// \param d pluker向量d=[x y z]^T
+    /// \param orth 正交参数[x y z w phi]^T
+    static void cvtPluckerToOrthonormal(const Eigen::Vector3d &n, const Eigen::Vector3d &d, double *orth);
+
+    static void cvtOrthonormalToPlucker(double *orth, Eigen::Vector3d &n, Eigen::Vector3d &d);
+
+
+    template<size_t N>
+    struct uint_ {
     };
 
-    template <size_t N, typename Lambda, typename IterT>
+    template<size_t N, typename Lambda, typename IterT>
     void unroller(const Lambda &f, const IterT &iter, uint_<N>)
     {
         unroller(f, iter, uint_<N - 1>());
         f(iter + N);
     }
 
-    template <typename Lambda, typename IterT>
+    template<typename Lambda, typename IterT>
     void unroller(const Lambda &f, const IterT &iter, uint_<0>)
     {
         f(iter);
     }
 
-    template <typename T>
-    static T normalizeAngle(const T& angle_degrees) {
-      T two_pi(2.0 * 180);
-      if (angle_degrees > 0)
-      return angle_degrees -
-          two_pi * std::floor((angle_degrees + T(180)) / two_pi);
-      else
-        return angle_degrees +
-            two_pi * std::floor((-angle_degrees + T(180)) / two_pi);
+    template<typename T>
+    static T normalizeAngle(const T &angle_degrees)
+    {
+        T two_pi(2.0*180);
+        if (angle_degrees > 0)
+            return angle_degrees -
+                   two_pi*std::floor((angle_degrees + T(180))/two_pi);
+        else
+            return angle_degrees +
+                   two_pi*std::floor((-angle_degrees + T(180))/two_pi);
     };
 };
