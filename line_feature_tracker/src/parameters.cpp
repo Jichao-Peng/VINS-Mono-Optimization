@@ -18,7 +18,7 @@ int FOCAL_LENGTH;
 int FISHEYE;
 bool PUB_THIS_FRAME;
 
-template <typename T>
+template<typename T>
 T readParam(ros::NodeHandle &n, std::string name)
 {
     T ans;
@@ -41,7 +41,7 @@ void readParameters(ros::NodeHandle &n)
 //    config_file = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/config/my_config/my_config.yaml";
 //    config_file = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/config/euroc/euroc_config.yaml";
     cv::FileStorage fsSettings(config_file, cv::FileStorage::READ);
-    if(!fsSettings.isOpened())
+    if (!fsSettings.isOpened())
     {
         std::cerr << "ERROR: Wrong path to settings" << std::endl;
     }

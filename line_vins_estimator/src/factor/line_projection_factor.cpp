@@ -7,10 +7,8 @@
 Eigen::Matrix2d LineProjectionFactor::sqrt_info;
 double LineProjectionFactor::sum_t;
 
-LineProjectionFactor::LineProjectionFactor(const Eigen::Vector3d &_Lw_n, const Eigen::Vector3d &_Lw_d,
-                                           const Eigen::Vector3d &_pts_s, const Eigen::Vector3d &_pts_e,
-                                           double *_para_Ex_Pose)
-        : Lw_n(_Lw_n), Lw_d(_Lw_d), pts_s(_pts_s), pts_e(_pts_e), para_Ex_Pose(_para_Ex_Pose)
+LineProjectionFactor::LineProjectionFactor(const Eigen::Vector3d &_pts_s, const Eigen::Vector3d &_pts_e, double *_para_Ex_Pose)
+        : pts_s(_pts_s), pts_e(_pts_e), para_Ex_Pose(_para_Ex_Pose)
 {
 //#ifdef UNIT_SPHERE_ERROR
 //    Eigen::Vector3d b1, b2;
@@ -25,18 +23,19 @@ LineProjectionFactor::LineProjectionFactor(const Eigen::Vector3d &_Lw_n, const E
 //#endif
 };
 
+
 bool LineProjectionFactor::Evaluate(double const *const *parameters, double *residuals, double **jacobians) const
 {
-//    TicToc tic_toc;
-//
-//    // i 帧相机pose
-//    Eigen::Vector3d Pj(parameters[0][0], parameters[0][1], parameters[0][2]);
-//    Eigen::Quaterniond Qj(parameters[0][6], parameters[0][3], parameters[0][4], parameters[0][5]);
-//    // i 帧直线在世界坐标系下参数 U and W，注意eigen Quaternion初始化顺序(w,x,y,z)
-//    Eigen::Quaterniond qW(parameters[1][3], parameters[1][0], parameters[1][1], parameters[1][2]);
-//    double phi = parameters[1][4];
-//
-//
+    TicToc tic_toc;
+
+    // i 帧相机pose
+    Eigen::Vector3d P(parameters[0][0], parameters[0][1], parameters[0][2]);
+    Eigen::Quaterniond Q(parameters[0][6], parameters[0][3], parameters[0][4], parameters[0][5]);//注意初始化顺序w,x,y,z
+    // i 帧直线在世界坐标系下参数 U and W，注意eigen Quaternion初始化顺序(w,x,y,z)
+    Eigen::Quaterniond qW(parameters[1][3], parameters[1][0], parameters[1][1], parameters[1][2]);
+    double phi = parameters[1][4];
+
+
 //    //i时刻相机坐标系下的map point的逆深度
 //    double inv_dep_i = parameters[3][0];
 //    //i时刻相机坐标系下的map point坐标
@@ -49,7 +48,7 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 //    Eigen::Vector3d pts_imu_j = Qj.inverse()*(pts_w - Pj);
 //    //在j时刻相机坐标系下的map point坐标
 //    Eigen::Vector3d pts_camera_j = qic.inverse()*(pts_imu_j - tic);
-//    Eigen::Map<Eigen::Vector2d> residual(residuals);
+    Eigen::Map<Eigen::Vector2d> residual(residuals);
 //
 //#ifdef UNIT_SPHERE_ERROR
 //    residual =  tangent_base * (pts_camera_j.normalized() - pts_j.normalized());
@@ -128,9 +127,9 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 //#endif
 //        }
 //    }
-//    sum_t += tic_toc.toc();
-//
-//    return true;
+    sum_t += tic_toc.toc();
+
+    return true;
 }
 
 void LineProjectionFactor::check(double **parameters)
