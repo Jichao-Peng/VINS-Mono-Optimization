@@ -47,8 +47,8 @@ public:
     int start_frame;
     int line_feature_id;
 
-    Vector3d Lw_n;//这两个是空间直线世界坐标系下的普吕克坐标
-    Vector3d Lw_d;
+    vector<double> line;
+    int used_num;
 };
 
 class LineFeatureManager
@@ -60,6 +60,9 @@ public:
     void removeFront(int frame_count);
     //TODO：实现直线三角化函数
     void line_triangulate(Vector3d Ps[], Vector3d tic[], Matrix3d ric[]);
+    vector<vector<double>> getLineVector();
+    int getFeatureCount();
+    void setLineFeature(vector<vector<double>> lineVector);
 };
 
 

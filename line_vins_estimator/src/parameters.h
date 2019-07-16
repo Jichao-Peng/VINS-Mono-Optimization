@@ -12,7 +12,7 @@ const double FOCAL_LENGTH = 460.0;
 const int WINDOW_SIZE = 10;
 const int NUM_OF_CAM = 1;
 const int NUM_OF_F = 1000;
-const int NUM_OF_L = 100;
+const int NUM_OF_L = 1000;
 //#define UNIT_SPHERE_ERROR
 
 extern double INIT_DEPTH;//深度初始值
@@ -49,7 +49,6 @@ enum SIZE_PARAMETERIZATION
     SIZE_SPEEDBIAS = 9,
     SIZE_FEATURE = 1,
     SIZE_LINE = 5,
-    SIZE_PLUKE_VECTOR = 3
 };
 
 enum StateOrder

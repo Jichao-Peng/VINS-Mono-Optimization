@@ -75,3 +75,61 @@ void LineFeatureManager::removeFront(int frame_count)
         }
     }
 }
+
+//返回当前线特征的数量
+int LineFeatureManager::getFeatureCount()
+{
+    int cnt = 0;
+    for (auto &it : line_feature)
+    {
+
+        it.used_num = it.line_feature_per_frame.size();
+
+        if (it.used_num >= 2 && it.start_frame < WINDOW_SIZE - 2)//要求线特征的被观察的数量大于2,也就是有用的线特征
+        {
+            cnt++;
+        }
+    }
+    return cnt;
+}
+
+//返回当前所有的世界坐标系下线特征
+vector<vector<double>> LineFeatureManager::getLineVector()
+{
+    vector<vector<double>> lineVector(getFeatureCount());
+    for(auto &it_per_id : line_feature)
+    {
+        it_per_id.used_num = it_per_id.line_feature_per_frame.size();
+        if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))//同理要求线特征的被观察的数量大于2,也就是有用的线特征
+            continue;
+        lineVector.push_back(it_per_id.line);
+    }
+    return lineVector;
+}
+
+
+void LineFeatureManager::setLineFeature(vector<vector<double>> lineVector)
+{
+    int feature_index = -1;
+    for (auto &it_per_id : line_feature)
+    {
+        it_per_id.used_num = it_per_id.line_feature_per_frame.size();
+        if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))
+            continue;
+
+        it_per_id.line = lineVector[++feature_index];
+        //TODO:如何仿照点一样判断是否求解成功
+    }
+}
+
+void LineFeatureManager::line_triangulate(Eigen::Matrix<double, 3, 1> *Ps, Vector3d *tic, Matrix3d *ric)
+{
+
+}
+
+
+
+
+
+
+

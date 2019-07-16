@@ -6,3 +6,6 @@
 
 ## line_feature_tracker
 - 修改了parameter.cpp中读取配置文件的内容
+
+## estimator & line_feature_manager
+- 添加了vector2double和double2vector两个函数中从优化变量和featuremanager中的变量之间的转换

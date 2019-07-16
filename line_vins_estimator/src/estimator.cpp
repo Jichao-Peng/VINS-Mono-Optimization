@@ -592,7 +592,7 @@ void Estimator::solveOdometry()
     {
         TicToc t_tri;
         f_manager.triangulate(Ps, tic, ric);
-        line_f_manager.line_triangulate(Ps, tic, ric)
+        line_f_manager.line_triangulate(Ps, tic, ric);
         ROS_DEBUG("triangulation costs %f", t_tri.toc());
         optimization();
     }
@@ -636,10 +636,18 @@ void Estimator::vector2double()
         para_Ex_Pose[i][5] = q.z();
         para_Ex_Pose[i][6] = q.w();
     }
-
     VectorXd dep = f_manager.getDepthVector();
     for (int i = 0; i < f_manager.getFeatureCount(); i++)
         para_Feature[i][0] = dep(i);
+
+    //提取线特征
+    vector<vector<double>> lineVector = line_f_manager.getLineVector();
+    for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
+    {
+        for(int j = 0; j<5; j++)
+            para_Line[i][j] = lineVector[i][j];
+    }
+
     if (ESTIMATE_TD)
         para_Td[0][0] = td;
 }
@@ -709,6 +717,16 @@ void Estimator::double2vector()
     for (int i = 0; i < f_manager.getFeatureCount(); i++)
         dep(i) = para_Feature[i][0];
     f_manager.setDepth(dep);
+
+    //更新线特征
+    vector<vector<double>> lineVector = line_f_manager.getLineVector();
+    for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
+    {
+        for(int j = 0; j<5; j++)
+            lineVector[i][j] = para_Line[i][j];
+    }
+    line_f_manager.setLineFeature(lineVector);
+
     if (ESTIMATE_TD)
         td = para_Td[0][0];
 
@@ -1063,9 +1081,9 @@ void Estimator::optimization()
                 {
                     Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
                     Vector3d pts_e = it_per_id.line_feature_per_frame[0].pts_e;
-                    LineProjectionFactor *line_f = new LineProjectionFactor(it_per_id.Lw_n, it_per_id.Lw_d, pts_s, pts_e, para_Ex_Pose[0]);
-                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
-                                                                                   vector<double*>{})
+//                    LineProjectionFactor *line_f = new LineProjectionFactor(it_per_id.Lw_n, it_per_id.Lw_d, pts_s, pts_e, para_Ex_Pose[0]);
+//                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
+//                                                                                   vector<double*>{})
                 }
             }
         }
