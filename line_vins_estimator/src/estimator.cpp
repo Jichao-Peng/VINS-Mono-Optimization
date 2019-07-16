@@ -1275,8 +1275,7 @@ void Estimator::slideWindowOld()
     sum_of_back++;
 
     bool shift_depth = solver_flag == NON_LINEAR ? true : false;
-    if (shift_depth)
-    {
+    if (shift_depth) {
         Matrix3d R0, R1;
         Vector3d P0, P1;
         //back_R0、back_P0为窗口中最老帧的位姿
@@ -1286,12 +1285,11 @@ void Estimator::slideWindowOld()
         P0 = back_P0 + back_R0 * tic[0];
         P1 = Ps[0] + Rs[0] * tic[0];
         f_manager.removeBackShiftDepth(R0, P0, R1, P1);//如果这个特征点的开始帧不是最老帧，则特征点所有帧数减一，如果是，则通过三维变换变换到下一帧上去
-    }
-    else
+    } else
         f_manager.removeBack();
 
     line_f_manager.removeBack();//因为线特征没有深度的概念，因此可以直接移除
-
+}
 /**
  * @brief   进行重定位
  * @optional    
