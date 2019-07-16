@@ -32,8 +32,13 @@ class LineFeaturePerId
 {
 public:
     LineFeaturePerId(int _line_feature_id, int _start_frame)
-    :line_feature_id(_line_feature_id), start_frame(_start_frame)
+    :start_frame(_start_frame), line_feature_id(_line_feature_id)
     {
+    }
+
+    int endFrame()
+    {
+        return start_frame + line_feature_per_frame.size() - 1;
     }
 
     vector<LineFeaturePerFrame> line_feature_per_frame;
@@ -46,6 +51,8 @@ class LineFeatureManager
 public:
     list<LineFeaturePerId> line_feature;
     void addFeature(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 4, 1>>>> &line_image, double td);
+    void removeBack();
+    void removeFront(int frame_count);
 };
 
 

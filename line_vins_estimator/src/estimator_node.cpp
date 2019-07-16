@@ -404,7 +404,7 @@ void process()
             }
             
             //处理图像特征
-            estimator.processImage(image, img_msg->header);
+            estimator.processImage(image, line_image, img_msg->header);
 
             double whole_t = t_s.toc();
             printStatistics(estimator, whole_t);

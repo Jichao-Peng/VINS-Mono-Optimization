@@ -1227,15 +1227,15 @@ void Estimator::slideWindow()
     {
         if (frame_count == WINDOW_SIZE)
         {
-            for (unsigned int i = 0; i < dt_buf[frame_count].size(); i++)
+            for (unsigned int i = 0; i < dt_buf[frame_count].size(); i++)//这一部分和预积分有关
             {
-                double tmp_dt = dt_buf[frame_count][i];
+                double tmp_dt = dt_buf[frame_count][i];//最新帧的时间、加速度和角速度
                 Vector3d tmp_linear_acceleration = linear_acceleration_buf[frame_count][i];
                 Vector3d tmp_angular_velocity = angular_velocity_buf[frame_count][i];
 
-                pre_integrations[frame_count - 1]->push_back(tmp_dt, tmp_linear_acceleration, tmp_angular_velocity);
+                pre_integrations[frame_count - 1]->push_back(tmp_dt, tmp_linear_acceleration, tmp_angular_velocity);//将最新帧的时间间隔、加速度、角度加入次新帧的预积分中
 
-                dt_buf[frame_count - 1].push_back(tmp_dt);
+                dt_buf[frame_count - 1].push_back(tmp_dt);//将最新帧的时间间隔、加速度和角速度等存入次新帧
                 linear_acceleration_buf[frame_count - 1].push_back(tmp_linear_acceleration);
                 angular_velocity_buf[frame_count - 1].push_back(tmp_angular_velocity);
             }
@@ -1248,7 +1248,7 @@ void Estimator::slideWindow()
             Bgs[frame_count - 1] = Bgs[frame_count];
 
             delete pre_integrations[WINDOW_SIZE];
-            pre_integrations[WINDOW_SIZE] = new IntegrationBase{acc_0, gyr_0, Bas[WINDOW_SIZE], Bgs[WINDOW_SIZE]};
+            pre_integrations[WINDOW_SIZE] = new IntegrationBase{acc_0, gyr_0, Bas[WINDOW_SIZE], Bgs[WINDOW_SIZE]};//删除最新帧的预积分
 
             dt_buf[WINDOW_SIZE].clear();
             linear_acceleration_buf[WINDOW_SIZE].clear();
@@ -1265,6 +1265,7 @@ void Estimator::slideWindowNew()
 {
     sum_of_front++;
     f_manager.removeFront(frame_count);
+    line_f_manager.removeFront(frame_count);//移除线特征
 }
 
 //滑动窗口边缘化最老帧时处理特征点被观测的帧号
@@ -1288,7 +1289,8 @@ void Estimator::slideWindowOld()
     }
     else
         f_manager.removeBack();
-}
+
+    line_f_manager.removeBack();//因为线特征没有深度的概念，因此可以直接移除
 
 /**
  * @brief   进行重定位

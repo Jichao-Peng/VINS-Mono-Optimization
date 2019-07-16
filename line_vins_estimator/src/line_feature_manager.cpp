@@ -28,3 +28,50 @@ void LineFeatureManager::addFeature(int frame_count, const map<int, vector<pair<
         }
     }
 }
+
+//边缘化最老帧相关的特征点
+void LineFeatureManager::removeBack()
+{
+    for(auto it = line_feature.begin(), it_next = line_feature.begin();
+    it != line_feature.end(); it = it_next)
+    {
+        it_next++;
+
+        if(it->start_frame != 0)
+            it->start_frame--;
+        else
+        {
+            it->line_feature_per_frame.erase(it->line_feature_per_frame.begin());
+            if(it->line_feature_per_frame.size() == 0)
+                line_feature.erase(it);
+        }
+    }
+}
+
+
+//边缘化次新帧相关的特征点
+void LineFeatureManager::removeFront(int frame_count)
+{
+    for(auto it = line_feature.begin(), it_next = line_feature.begin();
+    it != line_feature.end(); it = it_next)
+    {
+        it_next++;
+
+        if(it->start_frame == frame_count)
+        {
+            it->start_frame--;
+        }
+        else
+        {
+            int j = WINDOW_SIZE - 1 - it->start_frame;//从起始帧到次新帧的位置
+            //如果次新帧之前已经跟踪结束就什么都不做
+            if(it->endFrame() < frame_count - 1)
+                continue;
+
+            //如果次新帧仍然被跟踪，则删除feature_per_frame中次新帧对应的FeaturePerFrame
+            it->line_feature_per_frame.erase(it->line_feature_per_frame.begin() + j);
+            if(it->line_feature_per_frame.size() == 0)
+                line_feature.erase(it);
+        }
+    }
+}

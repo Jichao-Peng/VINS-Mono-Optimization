@@ -38,13 +38,15 @@ void readParameters(ros::NodeHandle &n)
 {
     std::string config_file;
     //config_file = readParam<std::string>(n, "config_file"); //最后跑的时候这里要改回来
-    config_file = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/config/my_config/my_config.yaml";
+    //config_file = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/config/my_config/my_config.yaml";
+    config_file = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization/config/euroc/euroc_config.yaml";
     cv::FileStorage fsSettings(config_file, cv::FileStorage::READ);
     if(!fsSettings.isOpened())
     {
         std::cerr << "ERROR: Wrong path to settings" << std::endl;
     }
     //std::string VINS_FOLDER_PATH = readParam<std::string>(n, "vins_folder"); //最后跑的时候这里要改回来
+    //std::string VINS_FOLDER_PATH = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization";
     std::string VINS_FOLDER_PATH = "/home/leo/ros1_vins_ws/src/VINS-Mono-Optimization";
 
     fsSettings["image_topic"] >> IMAGE_TOPIC;
