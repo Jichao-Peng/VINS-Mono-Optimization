@@ -23,8 +23,6 @@ public:
     /// \brief 后端优化需要传入的直线观测值和投影值
     ///
     /// 得到的点是在image plane下，残差也是在image plane下完成的
-    /// \param _Lw_n 世界坐标系下的直线普吕克坐标n
-    /// \param _Lw_d 世界坐标系下的直线普吕克坐标d
     /// \param _pts_s image plane的直线起止点
     /// \param _pts_e
     /// \param _para_Ex_Pose imu和camera外参，这个地方一定要用指针，只有这样才能保证，其他地方优化这个变量的时候，该处能够使用最新的外参
@@ -42,6 +40,8 @@ public:
     /// \param mode 0 从camera到world
     ///             1 从world到camera
     void projectLine(const Eigen::Matrix3d &R_wc, const Eigen::Vector3d &t_wc, int mode = 0);
+
+
 
     Eigen::Vector3d Lw_n;
     Eigen::Vector3d Lw_d;
