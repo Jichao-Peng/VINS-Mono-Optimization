@@ -18,7 +18,7 @@
 /// 7： i帧imu pose(P_wbi, R_wbi)
 /// 5： i帧直线在World坐标系中参数[q1,q2,q3,q4,phi]前4个表示U matrix, 最后一个表示W matrix
 class LineProjectionFactor : public ceres::SizedCostFunction<2, 7, 5> {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 public:
     /// \brief 后端优化需要传入的直线观测值和投影值
     ///

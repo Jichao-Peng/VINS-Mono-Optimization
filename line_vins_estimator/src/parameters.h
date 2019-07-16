@@ -48,7 +48,8 @@ enum SIZE_PARAMETERIZATION
     SIZE_POSE = 7,
     SIZE_SPEEDBIAS = 9,
     SIZE_FEATURE = 1,
-    SIZE_LINE = 5
+    SIZE_LINE = 5,
+    SIZE_PLUKE_VECTOR = 3
 };
 
 enum StateOrder

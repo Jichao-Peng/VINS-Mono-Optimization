@@ -18,6 +18,7 @@
 #include "factor/projection_factor.h"
 #include "factor/projection_td_factor.h"
 #include "factor/marginalization_factor.h"
+#include "factor/line_projection_factor.h"
 
 #include <unordered_map>
 #include <queue>
@@ -122,6 +123,8 @@ class Estimator
     double para_Td[1][1];
     double para_Tr[1][1];
     double para_Line[NUM_OF_L][SIZE_LINE]; // line feature params 6
+    double para_Lw_n[NUM_OF_F][SIZE_PLUKE_VECTOR];
+    double para_Lw_d[NUM_OF_F][SIZE_PLUKE_VECTOR];
 
 
     int loop_window_index;

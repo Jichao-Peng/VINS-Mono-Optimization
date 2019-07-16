@@ -1,4 +1,5 @@
 #include "estimator.h"
+#include "line_feature_manager.h"
 
 Estimator::Estimator(): f_manager{Rs}
 {
@@ -590,7 +591,8 @@ void Estimator::solveOdometry()
     if (solver_flag == NON_LINEAR)
     {
         TicToc t_tri;
-        f_manager.triangulate(Ps, tic, ric);//TODO:这个tic的具体值不知道是在哪里求的
+        f_manager.triangulate(Ps, tic, ric);
+        line_f_manager.line_triangulate(Ps, tic, ric)
         ROS_DEBUG("triangulation costs %f", t_tri.toc());
         optimization();
     }
@@ -1052,6 +1054,22 @@ void Estimator::optimization()
                 }
             }
         }
+
+        //3、将被第零帧观测到的所有普吕克之间，添加到marginalization_info中
+        {
+            for(auto &it_per_id : line_f_manager.line_feature)
+            {
+                if(it_per_id.start_frame == 0)
+                {
+                    Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
+                    Vector3d pts_e = it_per_id.line_feature_per_frame[0].pts_e;
+                    LineProjectionFactor *line_f = new LineProjectionFactor(it_per_id.Lw_n, it_per_id.Lw_d, pts_s, pts_e, para_Ex_Pose[0]);
+                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
+                                                                                   vector<double*>{})
+                }
+            }
+        }
+
 
         TicToc t_pre_margin;
 
