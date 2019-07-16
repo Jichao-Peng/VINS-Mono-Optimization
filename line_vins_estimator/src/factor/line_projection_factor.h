@@ -28,13 +28,20 @@ public:
     /// \param _pts_s image plane的直线起止点
     /// \param _pts_e
     /// \param _para_Ex_Pose imu和camera外参，这个地方一定要用指针，只有这样才能保证，其他地方优化这个变量的时候，该处能够使用最新的外参
-    LineProjectionFactor(const Eigen::Vector3d &_Lw_n, const Eigen::Vector3d &_Lw_d,
-                         const Eigen::Vector3d &_pts_s, const Eigen::Vector3d &_pts_e,
+    LineProjectionFactor(const Eigen::Vector3d &_pts_s, const Eigen::Vector3d &_pts_e,
                          double *_para_Ex_Pose);
 
     virtual bool Evaluate(double const *const *parameters, double *residuals, double **jacobians) const;
 
     void check(double **parameters);
+
+    /// \brief
+    ///
+    /// \param R_wc
+    /// \param t_wc
+    /// \param mode 0 从camera到world
+    ///             1 从world到camera
+    void projectLine(const Eigen::Matrix3d &R_wc, const Eigen::Vector3d &t_wc, int mode = 0);
 
     Eigen::Vector3d Lw_n;
     Eigen::Vector3d Lw_d;
