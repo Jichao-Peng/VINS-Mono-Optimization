@@ -1075,15 +1075,23 @@ void Estimator::optimization()
 
         //3、将被第零帧观测到的所有普吕克之间，添加到marginalization_info中
         {
+            int line_feature_index = -1;
             for(auto &it_per_id : line_f_manager.line_feature)
             {
+                if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))//因为在vector2double里面取para_Line的时候加了这个条件，所以这里必须也要加
+                    continue;
+
+                ++line_feature_index;
+
                 if(it_per_id.start_frame == 0)
                 {
                     Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
                     Vector3d pts_e = it_per_id.line_feature_per_frame[0].pts_e;
-//                    LineProjectionFactor *line_f = new LineProjectionFactor(it_per_id.Lw_n, it_per_id.Lw_d, pts_s, pts_e, para_Ex_Pose[0]);
-//                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
-//                                                                                   vector<double*>{})
+                    LineProjectionFactor *line_f = new LineProjectionFactor(pts_s, pts_e, para_Ex_Pose[0]);
+                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
+                                                                                   vector<double*>{para_Pose[0], para_Line[line_feature_index]},
+                                                                                   vector<int>{0,1});
+                    marginalization_info->addResidualBlockInfo(residual_block_info);
                 }
             }
         }
