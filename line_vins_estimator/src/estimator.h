@@ -121,6 +121,8 @@ class Estimator
     double para_Retrive_Pose[SIZE_POSE];
     double para_Td[1][1];
     double para_Tr[1][1];
+    double para_Line[NUM_OF_L][SIZE_LINE]; // line feature params 6
+
 
     int loop_window_index;
 

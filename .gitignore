@@ -11,3 +11,6 @@ A3_rs/
 A3_rs.launch
 test/
 test.launch
+.idea
+line_feature_tracker/line_descriptor/build
+*/.idea

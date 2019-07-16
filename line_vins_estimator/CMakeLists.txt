@@ -49,7 +49,7 @@ add_executable(line_vins_estimator
     src/initial/initial_aligment.cpp
     src/initial/initial_sfm.cpp
     src/initial/initial_ex_rotation.cpp
-    )
+        src/factor/line_local_parameterization.cpp src/factor/line_local_parameterization.h src/factor/line_projection_factor.cpp src/factor/line_projection_factor.h)
 
 
 target_link_libraries(line_vins_estimator ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
