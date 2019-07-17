@@ -195,12 +195,14 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
             {
                 if(trackerData[i].line_track_cnt[j] > 1)
                 {
+                    Vector3d un_pts_s, un_pts_e;
+                    trackerData->undistortedline(un_pts_s, un_pts_e, lines[j]);
                     int p_line_id = line_ids[j];
                     id_of_line.values.push_back(p_line_id * NUM_OF_CAM + i);
-                    start_x_of_line.values.push_back(lines[j].startPointX);
-                    start_y_of_line.values.push_back(lines[j].startPointY);
-                    end_x_of_line.values.push_back(lines[j].endPointX);
-                    end_y_of_line.values.push_back(lines[j].endPointY);
+                    start_x_of_line.values.push_back(un_pts_s.x()/un_pts_s.z());
+                    start_y_of_line.values.push_back(un_pts_s.y()/un_pts_s.z());
+                    end_x_of_line.values.push_back(un_pts_e.x()/un_pts_e.z());
+                    end_y_of_line.values.push_back(un_pts_e.y()/un_pts_e.z());
                 }
             }
 

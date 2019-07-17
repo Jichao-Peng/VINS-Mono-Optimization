@@ -9,3 +9,11 @@
 
 ## estimator & line_feature_manager
 - 添加了vector2double和double2vector两个函数中从优化变量和featuremanager中的变量之间的转换
+
+## line_feature_tracker
+- 2019-07-17
+将发布的直线端点改成了归一化平面
+
+## estimator
+-初步完成了marg和slidWindow部分，待测试 
+
