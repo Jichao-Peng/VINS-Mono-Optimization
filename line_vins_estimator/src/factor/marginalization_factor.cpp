@@ -289,10 +289,10 @@ void MarginalizationInfo::marginalize()
 
     //下面就是更新先验残差项
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes2(A);//求特征值
-    Eigen::VectorXd S = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array(), 0));
-    Eigen::VectorXd S_inv = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array().inverse(), 0));
+    Eigen::VectorXd S = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array(), 0));//特征值
+    Eigen::VectorXd S_inv = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array().inverse(), 0));//特征值的逆
 
-    Eigen::VectorXd S_sqrt = S.cwiseSqrt();
+    Eigen::VectorXd S_sqrt = S.cwiseSqrt();//开根号
     Eigen::VectorXd S_inv_sqrt = S_inv.cwiseSqrt();
 
     //这里相当于是求出了Marg之后的雅克比矩阵和残差项，用到后面的迭代求解状态变量
@@ -364,11 +364,11 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
     {
         int size = marginalization_info->keep_block_size[i];
         int idx = marginalization_info->keep_block_idx[i] - m;
-        Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);
-        Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);
-        if (size != 7)
+        Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);//这是一个地址
+        Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);//这是一个地址
+        if (size != 7)//不是位姿
             dx.segment(idx, size) = x - x0;
-        else
+        else//是位姿
         {
             dx.segment<3>(idx + 0) = x.head<3>() - x0.head<3>();
             dx.segment<3>(idx + 3) = 2.0 * Utility::positify(Eigen::Quaterniond(x0(6), x0(3), x0(4), x0(5)).inverse() * Eigen::Quaterniond(x(6), x(3), x(4), x(5))).vec();

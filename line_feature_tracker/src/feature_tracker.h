@@ -93,4 +93,6 @@ class FeatureTracker
     static int n_line_id;
 
     double prev_min_length, cur_min_length, forw_min_length;
+
+    void undistortedline(Vector3d& un_pts_s, Vector3d& un_pts_e, cv::line_descriptor::KeyLine line);
 };

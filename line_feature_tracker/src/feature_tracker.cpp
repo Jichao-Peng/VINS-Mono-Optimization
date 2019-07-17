@@ -264,13 +264,13 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
         }
     }
 
-    cout<<endl;
-    for(auto id:line_ids)
-        cout<<setw(5)<<id;
-    cout<<endl;
-    for(auto cnt:line_track_cnt)
-        cout<<setw(5)<<cnt;
-    cout<<endl;
+//    cout<<endl;
+//    for(auto id:line_ids)
+//        cout<<setw(5)<<id;
+//    cout<<endl;
+//    for(auto cnt:line_track_cnt)
+//        cout<<setw(5)<<cnt;
+//    cout<<endl;
 
 
     //-------------------------------------上面是和线相关的数据处理----------------------------------------
@@ -454,4 +454,14 @@ void FeatureTracker::undistortedPoints()
         }
     }
     prev_un_pts_map = cur_un_pts_map;
+}
+
+
+void FeatureTracker::undistortedline(Vector3d &un_pts_s, Vector3d &un_pts_e, cv::line_descriptor::KeyLine line)
+{
+    Vector2d pts_s, pts_e;
+    pts_s<<line.startPointX, line.startPointY;
+    pts_e<<line.endPointX, line.endPointY;
+    m_camera->liftProjective(pts_s, un_pts_s);
+    m_camera->liftProjective(pts_e, un_pts_e);
 }

@@ -1,4 +1,5 @@
 #include "estimator.h"
+#include "line_feature_manager.h"
 
 Estimator::Estimator(): f_manager{Rs}
 {
@@ -590,7 +591,8 @@ void Estimator::solveOdometry()
     if (solver_flag == NON_LINEAR)
     {
         TicToc t_tri;
-        f_manager.triangulate(Ps, tic, ric);//TODO:这个tic的具体值不知道是在哪里求的
+        f_manager.triangulate(Ps, tic, ric);
+        line_f_manager.line_triangulate(Ps, tic, ric);
         ROS_DEBUG("triangulation costs %f", t_tri.toc());
         optimization();
     }
@@ -634,10 +636,18 @@ void Estimator::vector2double()
         para_Ex_Pose[i][5] = q.z();
         para_Ex_Pose[i][6] = q.w();
     }
-
     VectorXd dep = f_manager.getDepthVector();
     for (int i = 0; i < f_manager.getFeatureCount(); i++)
         para_Feature[i][0] = dep(i);
+
+    //提取线特征
+    vector<vector<double>> lineVector = line_f_manager.getLineVector();
+    for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
+    {
+        for(int j = 0; j<5; j++)
+            para_Line[i][j] = lineVector[i][j];
+    }
+
     if (ESTIMATE_TD)
         para_Td[0][0] = td;
 }
@@ -707,6 +717,16 @@ void Estimator::double2vector()
     for (int i = 0; i < f_manager.getFeatureCount(); i++)
         dep(i) = para_Feature[i][0];
     f_manager.setDepth(dep);
+
+    //更新线特征
+    vector<vector<double>> lineVector = line_f_manager.getLineVector();
+    for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
+    {
+        for(int j = 0; j<5; j++)
+            lineVector[i][j] = para_Line[i][j];
+    }
+    line_f_manager.setLineFeature(lineVector);
+
     if (ESTIMATE_TD)
         td = para_Td[0][0];
 
@@ -1052,6 +1072,30 @@ void Estimator::optimization()
                 }
             }
         }
+
+        //3、将被第零帧观测到的所有普吕克之间，添加到marginalization_info中
+        {
+            int line_feature_index = -1;
+            for(auto &it_per_id : line_f_manager.line_feature)
+            {
+                if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))//因为在vector2double里面取para_Line的时候加了这个条件，所以这里必须也要加
+                    continue;
+
+                ++line_feature_index;
+
+                if(it_per_id.start_frame == 0)
+                {
+                    Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
+                    Vector3d pts_e = it_per_id.line_feature_per_frame[0].pts_e;
+                    LineProjectionFactor *line_f = new LineProjectionFactor(pts_s, pts_e, para_Ex_Pose[0]);
+                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
+                                                                                   vector<double*>{para_Pose[0], para_Line[line_feature_index]},
+                                                                                   vector<int>{0,1});
+                    marginalization_info->addResidualBlockInfo(residual_block_info);
+                }
+            }
+        }
+
 
         TicToc t_pre_margin;
 

@@ -19,13 +19,15 @@ class LineFeaturePerFrame
 public:
     LineFeaturePerFrame(const Eigen::Matrix<double, 4, 1> &line, double td)
     {
-        start_point.x() = line(0);
-        start_point.y() = line(1);
-        end_point.x() = line(2);
-        end_point.y() = line(3);
+        pts_s.x() = line(0);
+        pts_s.y() = line(1);
+        pts_s.z() = 1;
+        pts_e.x() = line(2);
+        pts_e.y() = line(3);
+        pts_e.z() = 1;
     }
-    Vector2d start_point;
-    Vector2d end_point;
+    Vector3d pts_s;
+    Vector3d pts_e;
 };
 
 class LineFeaturePerId
@@ -44,6 +46,9 @@ public:
     vector<LineFeaturePerFrame> line_feature_per_frame;
     int start_frame;
     int line_feature_id;
+
+    vector<double> line;
+    int used_num;
 };
 
 class LineFeatureManager
@@ -53,6 +58,11 @@ public:
     void addFeature(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 4, 1>>>> &line_image, double td);
     void removeBack();
     void removeFront(int frame_count);
+    //TODO：实现直线三角化函数
+    void line_triangulate(Vector3d Ps[], Vector3d tic[], Matrix3d ric[]);
+    vector<vector<double>> getLineVector();
+    int getFeatureCount();
+    void setLineFeature(vector<vector<double>> lineVector);
 };
 
 
