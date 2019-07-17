@@ -101,7 +101,7 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
         reduce = tangent_base * norm_jaco;
 #else
         reduce_1 << (u1*l2*l2 - l1*l2*v1 - l1*l3)/l1l2_23, (v1*l1*l1 - l1*l2*u1 - l2*l3)/l1l2_23, 1/line_un.head(2).norm(),
-                (u2*l2*l2 - l1*l2*v2 - l1*l3)/l1l2_23, (v2*l1*l1 - l1*l1*v2 - l2*l3)/l1l2_23,, 1/line_un.head(2).norm();
+                (u2*l2*l2 - l1*l2*v2 - l1*l3)/l1l2_23, (v2*l1*l1 - l1*l1*v2 - l2*l3)/l1l2_23, 1/line_un.head(2).norm();
         reduce_2.setZero();
         reduce_2.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();
         reduce = reduce_1*reduce_2;
@@ -137,14 +137,26 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 
         if (jacobians[1])
         {
-            Eigen::Map<Eigen::Matrix<double, 2, 5, Eigen::RowMajor>> jacobian_pose_j(jacobians[1]);
+            //准备工作
+            double w1 = cos(phi);
+            double w2 = sin(phi);
+            Eigen::Vector3d U1 = Lw_n.normalized();
+            Eigen::Vector3d U2 = Lw_d.normalized();
+            Eigen::Vector3d U3 = Lw_n.cross(Lw_d).normalized();
 
-            Eigen::Matrix<double, 6, 4> jaco_j;
-            jaco_j.leftCols<3>() = ric.transpose()*-Rj.transpose();
-            jaco_j.rightCols<3>() = ric.transpose()*Utility::skewSymmetric(pts_imu_j);
 
-            jacobian_pose_j.leftCols<6>() = reduce*jaco_j;
-            jacobian_pose_j.rightCols<1>().setZero();
+            Eigen::Map<Eigen::Matrix<double, 2, 5, Eigen::RowMajor>> jacobian_line(jacobians[1]);
+
+            Eigen::Matrix<double, 6, 5> jaco_i;
+            jaco_i.setZero();
+            jaco_i.block<3, 1>(3, 0) = w2*U3;
+            jaco_i.block<3, 1>(0, 1) = -w1*U3;
+            jaco_i.block<3, 1>(0, 2) = w1*U2;
+            jaco_i.block<3, 1>(3, 2) = -w2*U1;
+            jaco_i.block<3, 1>(0, 4) = -w2*U1;
+            jaco_i.block<3, 1>(3, 4) = w1*U2;
+
+            jacobian_line = reduce*jaco_i;
         }
 //        if (jacobians[2])
 //        {
