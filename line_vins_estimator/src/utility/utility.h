@@ -114,8 +114,10 @@ public:
     /// \param d pluker向量d=[x y z]^T
     /// \param orth 正交参数[x y z w phi]^T
     static void cvtPluckerToOrthonormal(const Eigen::Vector3d &n, const Eigen::Vector3d &d, double *orth);
+    static void cvtPluckerToOrthonormal(const Eigen::Vector3d &n, const Eigen::Vector3d &d, std::vector<double>& orth);
 
     static void cvtOrthonormalToPlucker(double *orth, Eigen::Vector3d &n, Eigen::Vector3d &d);
+    static void cvtOrthonormalToPlucker(std::vector<double>& orth, Eigen::Vector3d &n, Eigen::Vector3d &d);
 
     enum ProjectLineMode {
         CameraToWorld,

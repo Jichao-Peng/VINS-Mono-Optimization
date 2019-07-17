@@ -6,6 +6,7 @@
 #define SRC_LINE_FEATURE_MANAGER_H
 
 #include <eigen3/Eigen/Dense>
+#include "utility/utility.h"
 using namespace Eigen;
 
 #include <ros/console.h>
@@ -54,6 +55,11 @@ public:
 class LineFeatureManager
 {
 public:
+    LineFeatureManager(Matrix3d _Rs[]);
+    void setRic(Matrix3d _ric[]);
+    void clearState();
+    void removeFailures();
+
     list<LineFeaturePerId> line_feature;
     void addFeature(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 4, 1>>>> &line_image, double td);
     void removeBack();
@@ -63,6 +69,9 @@ public:
     vector<vector<double>> getLineVector();
     int getFeatureCount();
     void setLineFeature(vector<vector<double>> lineVector);
+
+    const Matrix3d *Rs;
+    Matrix3d ric[NUM_OF_CAM];
 };
 
 

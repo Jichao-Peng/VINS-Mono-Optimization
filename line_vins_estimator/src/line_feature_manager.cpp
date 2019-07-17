@@ -4,6 +4,24 @@
 
 #include "line_feature_manager.h"
 
+LineFeatureManager::LineFeatureManager(Eigen::Matrix<double, 3, 3> *_Rs)
+{
+    for (int i = 0; i < NUM_OF_CAM; i++)
+        ric[i].setIdentity();
+}
+
+void LineFeatureManager::setRic(Matrix3d _ric[])
+{
+    for (int i = 0; i < NUM_OF_CAM; i++)
+    {
+        ric[i] = _ric[i];
+    }
+}
+
+void LineFeatureManager::clearState() {};
+
+//TODO:后端优化求解失败的时候应该移除掉失败线
+void LineFeatureManager::removeFailures() {};
 
 void LineFeatureManager::addFeature(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 4, 1>>>> &line_image, double td)
 {
@@ -118,13 +136,56 @@ void LineFeatureManager::setLineFeature(vector<vector<double>> lineVector)
             continue;
 
         it_per_id.line = lineVector[++feature_index];
-        //TODO:如何仿照点一样判断是否求解成功
+
+        //TODO:如何仿照点一样判断是否求解成功，并移除失败线
     }
 }
 
 void LineFeatureManager::line_triangulate(Eigen::Matrix<double, 3, 1> *Ps, Vector3d *tic, Matrix3d *ric)
 {
+    for(auto &it_per_id : line_feature)
+    {
+        it_per_id.used_num = it_per_id.line_feature_per_frame.size();
+        if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))
+            continue;
 
+        if(!it_per_id.line.empty())
+            continue;
+
+        int s_f = it_per_id.start_frame;
+        int e_f = it_per_id.start_frame+it_per_id.used_num-1;
+
+        Eigen::Vector3d t0 = Ps[s_f] + Rs[s_f] * tic[0];
+        Eigen::Matrix3d R0 = Rs[s_f] * ric[0];
+
+        Eigen::Vector3d t1 = Ps[e_f] + Rs[e_f] * tic[0];//第R_1和t_1是第j帧在世界坐标系下的位姿
+        Eigen::Matrix3d R1 = Rs[e_f] * ric[0];
+
+        Eigen::Vector3d t = R0.transpose() * (t1 - t0);//R和t是从第i帧到第j帧的变换位姿
+        Eigen::Matrix3d R = R0.transpose() * R1;
+
+        //计算起始帧上直线构成的平面
+        Vector3d pi_xyz_0 = it_per_id.line_feature_per_frame[0].pts_s.cross( it_per_id.line_feature_per_frame[0].pts_e);//起始点与终止点叉乘
+        double pi_w_0 = pi_xyz_0.dot(t0);//pi_xyz和相机中心点成
+
+        //计算结束帧上直线构成的平面
+        Vector3d pi_xyz_1 = it_per_id.line_feature_per_frame.back().pts_s.cross( it_per_id.line_feature_per_frame.back().pts_e);//起始点与终止点叉乘
+        double pi_w_1 = pi_xyz_1.dot(t1);//pi_xyz和相机中心点成
+
+        Vector4d pi_0, pi_1;
+        pi_0<< pi_xyz_0.x(), pi_xyz_0.y(), pi_xyz_0.z(), pi_w_0;//构建前后两帧pi平面
+        pi_1<< pi_xyz_1.x(), pi_xyz_1.y(), pi_xyz_1.z(), pi_w_1;
+
+        Matrix4d matrix_pu = pi_1*pi_0.transpose() - pi_1*pi_0.transpose();
+
+        Vector3d pu_n, pu_d;
+        pu_n = matrix_pu.block<3,1>(3,0);
+        pu_d<<-matrix_pu(1,2), matrix_pu(0,2), -matrix_pu(0,1);
+
+        Utility::cvtPluckerToOrthonormal(pu_n, pu_d, it_per_id.line);
+
+        //TODO:在点的三角化中会对求解结果有一个限制
+    }
 }
 
 
