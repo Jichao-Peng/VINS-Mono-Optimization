@@ -117,6 +117,36 @@ public:
 
     static void cvtOrthonormalToPlucker(double *orth, Eigen::Vector3d &n, Eigen::Vector3d &d);
 
+    enum ProjectLineMode {
+        CameraToWorld,
+        WorldToCamera
+    };
+
+    /// \brief
+    ///
+    /// \param R_wc
+    /// \param t_wc
+    /// \param mode 0 从camera到world
+    ///             1 从world到camera
+    static Eigen::Matrix<double, 6, 6> getProjectLineTransform(const Eigen::Matrix3d &R_wc, const Eigen::Vector3d &t_wc, const ProjectLineMode mode = WorldToCamera)
+    {
+        Eigen::Matrix3d R_cw = R_wc.transpose();
+        Eigen::Vector3d t_cw = -R_cw*t_wc;
+        Eigen::Matrix<double, 6, 6> T;
+        T.setZero();
+
+        T.block<3, 3>(0, 0) = R_cw;
+        T.block<3, 3>(0, 3) = Utility::skewSymmetric(t_cw)*R_cw;
+        T.block<3, 3>(3, 3) = R_cw;
+        if (mode == WorldToCamera)
+        {
+            return T;
+        }
+        else if (mode == CameraToWorld)
+        {
+            return T.inverse();
+        }
+    }
 
     template<size_t N>
     struct uint_ {

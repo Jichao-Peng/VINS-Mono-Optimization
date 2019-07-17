@@ -32,12 +32,12 @@ void Utility::cvtPluckerToOrthonormal(const Eigen::Vector3d &n, const Eigen::Vec
     orth[4] = phi;
 }
 
-void Utility::cvtOrthonormalToPlucker(double *orth, Eigen::Vector3d &n, Eigen::Vector3d &d)
+void Utility::cvtOrthonormalToPlucker(double*orth, Eigen::Vector3d &n, Eigen::Vector3d &d)
 {
     //使用Map对应的初始化位置如下
     //orth: [1 2 3 4]
     //qu:    x y z w
-    Eigen::Map<Eigen::Quaterniond> qu(orth);
+    Eigen::Quaterniond qu(orth[3], orth[0], orth[1], orth[2]);
     double phi = orth[4];
 
     Eigen::Matrix3d U = qu.toRotationMatrix();
