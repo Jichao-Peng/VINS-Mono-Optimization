@@ -226,8 +226,8 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                     //cv::putText(tmp_img, name, trackerData[i].cur_pts[j], cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
                 }
             }
-            cv::imshow("vis", stereo_img);
-            cv::waitKey(5);
+            //cv::imshow("vis", stereo_img);
+            //cv::waitKey(5);
             pub_match.publish(ptr->toImageMsg());
         }
     }

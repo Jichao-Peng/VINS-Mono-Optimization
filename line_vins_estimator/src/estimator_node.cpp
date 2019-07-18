@@ -455,8 +455,8 @@ int main(int argc, char **argv)
 
     //订阅IMU、feature、restart、match_points的topic,执行各自回调函数
     ros::Subscriber sub_imu = n.subscribe(IMU_TOPIC, 2000, imu_callback, ros::TransportHints().tcpNoDelay());
-    ros::Subscriber sub_image = n.subscribe("/feature_tracker/feature", 2000, feature_callback);
-    ros::Subscriber sub_restart = n.subscribe("/feature_tracker/restart", 2000, restart_callback);
+    ros::Subscriber sub_image = n.subscribe("/line_feature_tracker/feature", 2000, feature_callback);
+    ros::Subscriber sub_restart = n.subscribe("/line_feature_tracker/restart", 2000, restart_callback);
     ros::Subscriber sub_relo_points = n.subscribe("/pose_graph/match_points", 2000, relocalization_callback);
 
     //创建VIO主线程

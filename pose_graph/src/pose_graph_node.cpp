@@ -560,13 +560,13 @@ int main(int argc, char **argv)
     fsSettings.release();
 
     //订阅topic并执行各自回调函数
-    ros::Subscriber sub_imu_forward = n.subscribe("/vins_estimator/imu_propagate", 2000, imu_forward_callback);
-    ros::Subscriber sub_vio = n.subscribe("/vins_estimator/odometry", 2000, vio_callback);
+    ros::Subscriber sub_imu_forward = n.subscribe("/line_vins_estimator/imu_propagate", 2000, imu_forward_callback);
+    ros::Subscriber sub_vio = n.subscribe("/line_vins_estimator/odometry", 2000, vio_callback);
     ros::Subscriber sub_image = n.subscribe(IMAGE_TOPIC, 2000, image_callback);
-    ros::Subscriber sub_pose = n.subscribe("/vins_estimator/keyframe_pose", 2000, pose_callback);
-    ros::Subscriber sub_extrinsic = n.subscribe("/vins_estimator/extrinsic", 2000, extrinsic_callback);
-    ros::Subscriber sub_point = n.subscribe("/vins_estimator/keyframe_point", 2000, point_callback);
-    ros::Subscriber sub_relo_relative_pose = n.subscribe("/vins_estimator/relo_relative_pose", 2000, relo_relative_pose_callback);
+    ros::Subscriber sub_pose = n.subscribe("/line_vins_estimator/keyframe_pose", 2000, pose_callback);
+    ros::Subscriber sub_extrinsic = n.subscribe("/line_vins_estimator/extrinsic", 2000, extrinsic_callback);
+    ros::Subscriber sub_point = n.subscribe("/line_vins_estimator/keyframe_point", 2000, point_callback);
+    ros::Subscriber sub_relo_relative_pose = n.subscribe("/line_vins_estimator/relo_relative_pose", 2000, relo_relative_pose_callback);
 
     //发布的topic
     pub_match_img = n.advertise<sensor_msgs::Image>("match_image", 1000);

@@ -37,15 +37,15 @@ T readParam(ros::NodeHandle &n, std::string name)
 void readParameters(ros::NodeHandle &n)
 {
     std::string config_file;
-    //config_file = readParam<std::string>(n, "config_file"); //最后跑的时候这里要改回来
-    config_file = "/home/leo/catkin_ws2/src/VINS-Mono-Learning/config/my_config/my_config.yaml";
+    config_file = readParam<std::string>(n, "config_file"); //最后跑的时候这里要改回来
+    //config_file = "/home/leo/catkin_ws2/src/VINS-Mono-Learning/config/my_config/my_config.yaml";
     cv::FileStorage fsSettings(config_file, cv::FileStorage::READ);
     if(!fsSettings.isOpened())
     {
         std::cerr << "ERROR: Wrong path to settings" << std::endl;
     }
-    //std::string VINS_FOLDER_PATH = readParam<std::string>(n, "vins_folder"); //最后跑的时候这里要改回来
-    std::string VINS_FOLDER_PATH = "/home/leo/catkin_ws2/src/VINS-Mono-Learning";
+    std::string VINS_FOLDER_PATH = readParam<std::string>(n, "vins_folder"); //最后跑的时候这里要改回来
+    //std::string VINS_FOLDER_PATH = "/home/leo/catkin_ws2/src/VINS-Mono-Learning";
 
     fsSettings["image_topic"] >> IMAGE_TOPIC;
     fsSettings["imu_topic"] >> IMU_TOPIC;

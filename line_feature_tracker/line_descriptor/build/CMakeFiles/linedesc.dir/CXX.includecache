@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -36,23 +36,23 @@ opencv2/core.hpp
 line_descriptor/descriptor_custom.hpp
 ../include/line_descriptor/descriptor_custom.hpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/3.5.1/CompilerIdCXX/CMakeCXXCompilerId.cpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/CMakeFiles/3.12.4/CompilerIdCXX/CMakeCXXCompilerId.cpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/LSDDetector_custom.cpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/LSDDetector_custom.cpp
 precomp_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/binary_descriptor_custom.cpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/binary_descriptor_custom.cpp
 precomp_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/binary_descriptor_matcher.cpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/binary_descriptor_matcher.cpp
 precomp_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitarray_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitarray_custom.hpp
 types_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/types_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/types_custom.hpp
 stdio.h
 -
 math.h
@@ -60,21 +60,21 @@ math.h
 string.h
 -
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitops_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitops_custom.hpp
 precomp_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
 intrin.h
 -
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/draw_custom.cpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/draw_custom.cpp
 precomp_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/precomp_custom.hpp
 algorithm
 -
 opencv2/core/utility.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/opencv2/core/utility.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/opencv2/core/utility.hpp
 opencv2/imgproc.hpp
 -
 opencv2/features2d.hpp
@@ -82,7 +82,7 @@ opencv2/features2d.hpp
 opencv2/highgui.hpp
 -
 opencv2/core.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/opencv2/core.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/opencv2/core.hpp
 iostream
 -
 map
@@ -106,15 +106,15 @@ sstream
 vector
 -
 bitarray_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitarray_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitarray_custom.hpp
 bitops_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitops_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/bitops_custom.hpp
 types_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/types_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/types_custom.hpp
 line_descriptor_custom.hpp
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/line_descriptor_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/line_descriptor_custom.hpp
 
-/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/types_custom.hpp
+/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/src/types_custom.hpp
 stdint.h
 -
 inttypes.h

@@ -214,8 +214,8 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
             *   double  k = 0.04                Harris角点检测需要的k值
             *)   
             */
-            cv::imshow("mask",mask);
-            cv::waitKey(1);
+            //cv::imshow("mask",mask);
+            //cv::waitKey(1);
 
             cv::goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask);
 

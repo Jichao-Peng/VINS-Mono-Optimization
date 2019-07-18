@@ -1,4 +1,4 @@
-# Install script for directory: /home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor
+# Install script for directory: /home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -32,6 +32,11 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
   set(CMAKE_INSTALL_SO_NO_EXE "1")
 endif()
 
+# Is this installation the result of a crosscompile?
+if(NOT DEFINED CMAKE_CROSSCOMPILING)
+  set(CMAKE_CROSSCOMPILING "FALSE")
+endif()
+
 if(CMAKE_INSTALL_COMPONENT)
   set(CMAKE_INSTALL_MANIFEST "install_manifest_${CMAKE_INSTALL_COMPONENT}.txt")
 else()
@@ -40,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/nrsl/code/vins_pro/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/aemc3/catkin_vins/src/VINS-Mono-Optimization/line_feature_tracker/line_descriptor/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
