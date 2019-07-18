@@ -644,6 +644,8 @@ void Estimator::vector2double()
 
     //提取线特征
     vector<vector<double>> lineVector = line_f_manager.getLineVector();
+//    cout<<lineVector.size()<<endl;
+//    cout<<lineVector[0].size()<<endl;
     for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
     {
         for(int j = 0; j<5; j++)

@@ -5,6 +5,13 @@ void ResidualBlockInfo::Evaluate()
     residuals.resize(cost_function->num_residuals());
 
     std::vector<int> block_sizes = cost_function->parameter_block_sizes();
+
+    for(auto b:block_sizes)
+        std::cout<<b<<" ";
+    std::cout<<std::endl;
+
+
+
     raw_jacobians = new double *[block_sizes.size()];
     jacobians.resize(block_sizes.size());
 
@@ -156,10 +163,11 @@ void* ThreadsConstructA(void* threadsstruct)
             int idx_i = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[i])];
             int size_i = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[i])];
             Eigen::MatrixXd jacobian_i;
+            //std::cout<<it->jacobians[i].rows()<<" "<<it->jacobians[i].cols()<<std::endl;
             if (size_i == 5)//正交坐标系
             {
                 size_i = 4;
-                jacobian_i.resize(it->jacobians[i].rows(),4);
+                jacobian_i.resize(it->jacobians[i].rows(), 4);
                 jacobian_i << it->jacobians[i].leftCols(3), it->jacobians[i].leftCols(1);
             }
             else
@@ -167,6 +175,8 @@ void* ThreadsConstructA(void* threadsstruct)
                 if (size_i == 7)
                     size_i = 6;
                 jacobian_i = it->jacobians[i].leftCols(size_i);//左边size_i列，不要最后一维
+
+                //std::cout<<it->jacobians[i]<<std::endl;
             }
 
 

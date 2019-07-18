@@ -269,8 +269,8 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
                 }
 
             }
-            cv::imshow("vis", stereo_img);
-            cv::waitKey(1);
+            //cv::imshow("vis", stereo_img);
+            //cv::waitKey(1);
             pub_match.publish(ptr->toImageMsg());
         }
     }

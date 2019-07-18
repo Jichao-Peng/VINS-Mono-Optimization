@@ -4,7 +4,7 @@
 
 #include "line_feature_manager.h"
 
-LineFeatureManager::LineFeatureManager(Eigen::Matrix<double, 3, 3> *_Rs)
+LineFeatureManager::LineFeatureManager(Eigen::Matrix<double, 3, 3> *_Rs):Rs(_Rs)
 {
     for (int i = 0; i < NUM_OF_CAM; i++)
         ric[i].setIdentity();
@@ -114,12 +114,13 @@ int LineFeatureManager::getFeatureCount()
 //返回当前所有的世界坐标系下线特征
 vector<vector<double>> LineFeatureManager::getLineVector()
 {
-    vector<vector<double>> lineVector(getFeatureCount());
+    vector<vector<double>> lineVector;
     for(auto &it_per_id : line_feature)
     {
         it_per_id.used_num = it_per_id.line_feature_per_frame.size();
         if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))//同理要求线特征的被观察的数量大于2,也就是有用的线特征
             continue;
+        //cout<<it_per_id.line.size()<<endl;
         lineVector.push_back(it_per_id.line);
     }
     return lineVector;
@@ -161,9 +162,6 @@ void LineFeatureManager::line_triangulate(Eigen::Matrix<double, 3, 1> *Ps, Vecto
         Eigen::Vector3d t1 = Ps[e_f] + Rs[e_f] * tic[0];//第R_1和t_1是第j帧在世界坐标系下的位姿
         Eigen::Matrix3d R1 = Rs[e_f] * ric[0];
 
-        Eigen::Vector3d t = R0.transpose() * (t1 - t0);//R和t是从第i帧到第j帧的变换位姿
-        Eigen::Matrix3d R = R0.transpose() * R1;
-
         //计算起始帧上直线构成的平面
         Vector3d pi_xyz_0 = it_per_id.line_feature_per_frame[0].pts_s.cross( it_per_id.line_feature_per_frame[0].pts_e);//起始点与终止点叉乘
         double pi_w_0 = pi_xyz_0.dot(t0);//pi_xyz和相机中心点成
@@ -171,18 +169,24 @@ void LineFeatureManager::line_triangulate(Eigen::Matrix<double, 3, 1> *Ps, Vecto
         //计算结束帧上直线构成的平面
         Vector3d pi_xyz_1 = it_per_id.line_feature_per_frame.back().pts_s.cross( it_per_id.line_feature_per_frame.back().pts_e);//起始点与终止点叉乘
         double pi_w_1 = pi_xyz_1.dot(t1);//pi_xyz和相机中心点成
+//        cout<<pi_xyz_0<<" "<<pi_xyz_1<<endl;
 
         Vector4d pi_0, pi_1;
         pi_0<< pi_xyz_0.x(), pi_xyz_0.y(), pi_xyz_0.z(), pi_w_0;//构建前后两帧pi平面
         pi_1<< pi_xyz_1.x(), pi_xyz_1.y(), pi_xyz_1.z(), pi_w_1;
 
-        Matrix4d matrix_pu = pi_1*pi_0.transpose() - pi_1*pi_0.transpose();
+        Matrix4d matrix_pu = pi_0*pi_1.transpose() - pi_1*pi_0.transpose();
+//        cout<<matrix_pu<<endl<<endl;
+
 
         Vector3d pu_n, pu_d;
-        pu_n = matrix_pu.block<3,1>(3,0);
+        pu_n = matrix_pu.block<3,1>(0,3);
         pu_d<<-matrix_pu(1,2), matrix_pu(0,2), -matrix_pu(0,1);
 
+//        cout<<pu_n<<" "<<pu_d<<endl;
+        it_per_id.line.resize(5);
         Utility::cvtPluckerToOrthonormal(pu_n, pu_d, it_per_id.line);
+//        cout<<it_per_id.line[0]<<" "<<it_per_id.line[1]<<" "<<it_per_id.line[2]<<" "<<it_per_id.line[3]<<" "<<it_per_id.line[4]<<" "<<endl;
 
         //TODO:在点的三角化中会对求解结果有一个限制
     }
