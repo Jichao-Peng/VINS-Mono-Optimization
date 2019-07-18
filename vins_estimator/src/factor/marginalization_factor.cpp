@@ -132,12 +132,7 @@ void MarginalizationInfo::preMarginalize()
 
 int MarginalizationInfo::localSize(int size) const
 {
-    //return size == 7 ? 6 : size;
-    if(size == 7)
-        return 5;
-    else if(size == 5)
-        return 4;
-    return size;
+    return size == 7 ? 6 : size;
 }
 
 int MarginalizationInfo::globalSize(int size) const
@@ -155,29 +150,15 @@ void* ThreadsConstructA(void* threadsstruct)
         {
             int idx_i = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[i])];
             int size_i = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[i])];
-            Eigen::MatrixXd jacobian_i;
-            if (size_i == 5)//正交坐标系
-            {
-                size_i = 4;
-                jacobian_i.resize(it->jacobians[i].rows(),4);
-                jacobian_i << it->jacobians[i].leftCols(3), it->jacobians[i].leftCols(1);
-            }
-            else
-            {
-                if (size_i == 7)
-                    size_i = 6;
-                jacobian_i = it->jacobians[i].leftCols(size_i);//左边size_i列，不要最后一维
-            }
-
-
+            if (size_i == 7)
+                size_i = 6;
+            Eigen::MatrixXd jacobian_i = it->jacobians[i].leftCols(size_i);//左边size_i列，不要最后一维
             for (int j = i; j < static_cast<int>(it->parameter_blocks.size()); j++)
             {
                 int idx_j = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[j])];
                 int size_j = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[j])];
                 if (size_j == 7)
                     size_j = 6;
-                else if(size_j == 5)
-                    size_j = 4;
                 Eigen::MatrixXd jacobian_j = it->jacobians[j].leftCols(size_j);
                 if (i == j)
                     p->A.block(idx_i, idx_j, size_i, size_j) += jacobian_i.transpose() * jacobian_j;
@@ -225,6 +206,34 @@ void MarginalizationInfo::marginalize()
     Eigen::VectorXd b(pos);
     A.setZero();
     b.setZero();
+    /*
+    for (auto it : factors)
+    {
+        for (int i = 0; i < static_cast<int>(it->parameter_blocks.size()); i++)
+        {
+            int idx_i = parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[i])];
+            int size_i = localSize(parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[i])]);
+            Eigen::MatrixXd jacobian_i = it->jacobians[i].leftCols(size_i);
+            for (int j = i; j < static_cast<int>(it->parameter_blocks.size()); j++)
+            {
+                int idx_j = parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[j])];
+                int size_j = localSize(parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[j])]);
+                Eigen::MatrixXd jacobian_j = it->jacobians[j].leftCols(size_j);
+                if (i == j)
+                    A.block(idx_i, idx_j, size_i, size_j) += jacobian_i.transpose() * jacobian_j;
+                else
+                {
+                    A.block(idx_i, idx_j, size_i, size_j) += jacobian_i.transpose() * jacobian_j;
+                    A.block(idx_j, idx_i, size_j, size_i) = A.block(idx_i, idx_j, size_i, size_j).transpose();
+                }
+            }
+            b.segment(idx_i, size_i) += jacobian_i.transpose() * it->residuals;
+        }
+    }
+    ROS_INFO("summing up costs %f ms", t_summing.toc());
+    */
+    //multi thread
+
 
     TicToc t_thread_summing;
     pthread_t tids[NUM_THREADS];
@@ -280,10 +289,10 @@ void MarginalizationInfo::marginalize()
 
     //下面就是更新先验残差项
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes2(A);//求特征值
-    Eigen::VectorXd S = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array(), 0));//特征值
-    Eigen::VectorXd S_inv = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array().inverse(), 0));//特征值的逆
+    Eigen::VectorXd S = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array(), 0));
+    Eigen::VectorXd S_inv = Eigen::VectorXd((saes2.eigenvalues().array() > eps).select(saes2.eigenvalues().array().inverse(), 0));
 
-    Eigen::VectorXd S_sqrt = S.cwiseSqrt();//开根号
+    Eigen::VectorXd S_sqrt = S.cwiseSqrt();
     Eigen::VectorXd S_inv_sqrt = S_inv.cwiseSqrt();
 
     //这里相当于是求出了Marg之后的雅克比矩阵和残差项，用到后面的迭代求解状态变量
@@ -355,11 +364,11 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
     {
         int size = marginalization_info->keep_block_size[i];
         int idx = marginalization_info->keep_block_idx[i] - m;
-        Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);//这是一个地址
-        Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);//这是一个地址
-        if (size != 7)//不是位姿
+        Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);
+        Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);
+        if (size != 7)
             dx.segment(idx, size) = x - x0;
-        else//是位姿
+        else
         {
             dx.segment<3>(idx + 0) = x.head<3>() - x0.head<3>();
             dx.segment<3>(idx + 3) = 2.0 * Utility::positify(Eigen::Quaterniond(x0(6), x0(3), x0(4), x0(5)).inverse() * Eigen::Quaterniond(x(6), x(3), x(4), x(5))).vec();
@@ -381,15 +390,7 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
                 int idx = marginalization_info->keep_block_idx[i] - m;
                 Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> jacobian(jacobians[i], n, size);
                 jacobian.setZero();
-                if(size != 5)
-                {
-                    jacobian.leftCols(local_size) = marginalization_info->linearized_jacobians.middleCols(idx, local_size);
-                }
-                else
-                {
-                    jacobian.leftCols(3) = marginalization_info->linearized_jacobians.middleCols(idx, 3);
-                    jacobian.rightCols(1) = marginalization_info->linearized_jacobians.middleCols(idx+3, 1);
-                }
+                jacobian.leftCols(local_size) = marginalization_info->linearized_jacobians.middleCols(idx, local_size);
             }
         }
     }

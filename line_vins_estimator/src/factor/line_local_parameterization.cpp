@@ -27,7 +27,7 @@ bool LineLocalParameterization::Plus(const double *x, const double *delta, doubl
             0, 0, 1;//phi初始值
 
     Eigen::Vector3d d_W(0, 0, d_phi);//phi更新量
-
+//TODO:可能有坑，检查更新
     Eigen::Quaterniond _qW(_W);
     Eigen::Quaterniond qW = (_qW*Utility::deltaQ(d_W)).normalized();
     Eigen::Matrix3d rW = qW.toRotationMatrix();

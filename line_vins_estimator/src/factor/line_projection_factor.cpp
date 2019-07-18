@@ -99,7 +99,7 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
                      - x1 * x2 / pow(norm, 3),            1.0 / norm - x2 * x2 / pow(norm, 3), - x2 * x3 / pow(norm, 3),
                      - x1 * x3 / pow(norm, 3),            - x2 * x3 / pow(norm, 3),            1.0 / norm - x3 * x3 / pow(norm, 3);
         reduce = tangent_base * norm_jaco;
-#else
+#else   //谢论文
         reduce_1 << (u1*l2*l2 - l1*l2*v1 - l1*l3)/l1l2_23, (v1*l1*l1 - l1*l2*u1 - l2*l3)/l1l2_23, 1/line_un.head(2).norm(),
                 (u2*l2*l2 - l1*l2*v2 - l1*l3)/l1l2_23, (v2*l1*l1 - l1*l1*v2 - l2*l3)/l1l2_23, 1/line_un.head(2).norm();
         reduce_2.setZero();

@@ -1,7 +1,6 @@
 #include "estimator.h"
-#include "line_feature_manager.h"
 
-Estimator::Estimator(): f_manager{Rs}, line_f_manager{Rs}
+Estimator::Estimator(): f_manager{Rs}
 {
     ROS_INFO("init begins");
     clearState();
@@ -16,9 +15,7 @@ void Estimator::setParameter()
         ric[i] = RIC[i];
     }
     f_manager.setRic(ric);
-    line_f_manager.setRic(ric);
     ProjectionFactor::sqrt_info = FOCAL_LENGTH / 1.5 * Matrix2d::Identity();
-    LineProjectionFactor::sqrt_info = FOCAL_LENGTH / 1.5 * Matrix2d::Identity();
     ProjectionTdFactor::sqrt_info = FOCAL_LENGTH / 1.5 * Matrix2d::Identity();
     td = TD;
 }
@@ -138,12 +135,11 @@ void Estimator::processIMU(double dt, const Vector3d &linear_acceleration, const
  * @param[in]   header 某帧图像的头信息
  * @return  void
 */
-void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, const map<int, vector<pair<int, Eigen::Matrix<double, 4, 1>>>> &line_image, const std_msgs::Header &header)
+void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, const std_msgs::Header &header)
 {
     ROS_DEBUG("new image coming ------------------------------------------");
     ROS_DEBUG("Adding feature points %lu", image.size());
 
-    line_f_manager.addFeature(frame_count, line_image, td);
     //添加之前检测到的特征点到feature容器中，计算每一个点跟踪的次数，以及它的视差
     //通过检测两帧之间的视差决定次新帧是否作为关键帧
     if (f_manager.addFeatureCheckParallax(frame_count, image, td))//这个函数返回的就是这一帧image是否为关键帧
@@ -593,8 +589,7 @@ void Estimator::solveOdometry()
     if (solver_flag == NON_LINEAR)
     {
         TicToc t_tri;
-        f_manager.triangulate(Ps, tic, ric);
-        line_f_manager.line_triangulate(Ps, tic, ric);
+        f_manager.triangulate(Ps, tic, ric);//TODO:这个tic的具体值不知道是在哪里求的
         ROS_DEBUG("triangulation costs %f", t_tri.toc());
         optimization();
     }
@@ -638,18 +633,10 @@ void Estimator::vector2double()
         para_Ex_Pose[i][5] = q.z();
         para_Ex_Pose[i][6] = q.w();
     }
+
     VectorXd dep = f_manager.getDepthVector();
     for (int i = 0; i < f_manager.getFeatureCount(); i++)
         para_Feature[i][0] = dep(i);
-
-    //提取线特征
-    vector<vector<double>> lineVector = line_f_manager.getLineVector();
-    for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
-    {
-        for(int j = 0; j<5; j++)
-            para_Line[i][j] = lineVector[i][j];
-    }
-
     if (ESTIMATE_TD)
         para_Td[0][0] = td;
 }
@@ -719,16 +706,6 @@ void Estimator::double2vector()
     for (int i = 0; i < f_manager.getFeatureCount(); i++)
         dep(i) = para_Feature[i][0];
     f_manager.setDepth(dep);
-
-    //更新线特征
-    vector<vector<double>> lineVector = line_f_manager.getLineVector();
-    for (int i = 0; i < line_f_manager.getFeatureCount(); i++)
-    {
-        for(int j = 0; j<5; j++)
-            lineVector[i][j] = para_Line[i][j];
-    }
-    line_f_manager.setLineFeature(lineVector);
-
     if (ESTIMATE_TD)
         td = para_Td[0][0];
 
@@ -877,10 +854,10 @@ void Estimator::optimization()
         IMUFactor* imu_factor = new IMUFactor(pre_integrations[j]);//这里面会计算残差以及残差对优化变量雅克比矩阵
         problem.AddResidualBlock(imu_factor, NULL, para_Pose[i], para_SpeedBias[i], para_Pose[j], para_SpeedBias[j]);//这里指定了相关的优化变量
     }
-
-    //添加视觉残差
     int f_m_cnt = 0;
     int feature_index = -1;
+
+    //添加视觉残差
     for (auto &it_per_id : f_manager.feature)//遍历滑窗内所有的空间点
     {
         it_per_id.used_num = it_per_id.feature_per_frame.size();
@@ -907,6 +884,15 @@ void Estimator::optimization()
                                                                      it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td,
                                                                      it_per_id.feature_per_frame[0].uv.y(), it_per_frame.uv.y());
                     problem.AddResidualBlock(f_td, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0]);
+                    /*
+                    double **para = new double *[5];
+                    para[0] = para_Pose[imu_i];
+                    para[1] = para_Pose[imu_j];
+                    para[2] = para_Ex_Pose[0];
+                    para[3] = para_Feature[feature_index];
+                    para[4] = para_Td[0];
+                    f_td->check(para);
+                    */
             }
             else
             {
@@ -914,27 +900,6 @@ void Estimator::optimization()
                 problem.AddResidualBlock(f, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index]);//这里指定了相关的优化变量
             }
             f_m_cnt++;
-        }
-    }
-
-    //添加线段视觉残差
-    int line_feature_index = -1;
-    for (auto &it_per_id : line_f_manager.line_feature)//遍历滑窗内所有的空间点
-    {
-        it_per_id.used_num = it_per_id.line_feature_per_frame.size();
-        if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))
-            continue;
-
-        ++line_feature_index;
-        int imu_j = it_per_id.start_frame-1;
-        for(auto &it_per_frame : it_per_id.line_feature_per_frame)
-        {
-            imu_j++;
-
-            Vector3d pts_s = it_per_frame.pts_s;
-            Vector3d pts_e = it_per_frame.pts_e;
-            LineProjectionFactor *line_f = new LineProjectionFactor(pts_s, pts_e, para_Ex_Pose[0]);
-            problem.AddResidualBlock(line_f, loss_function, para_Pose[imu_j], para_Line[line_feature_index]);
         }
     }
 
@@ -1086,30 +1051,6 @@ void Estimator::optimization()
                 }
             }
         }
-
-        //3、将被第零帧观测到的所有普吕克之间，添加到marginalization_info中
-        {
-            int line_feature_index = -1;
-            for(auto &it_per_id : line_f_manager.line_feature)
-            {
-                if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))//因为在vector2double里面取para_Line的时候加了这个条件，所以这里必须也要加
-                    continue;
-
-                ++line_feature_index;
-
-                if(it_per_id.start_frame == 0)
-                {
-                    Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
-                    Vector3d pts_e = it_per_id.line_feature_per_frame[0].pts_e;
-                    LineProjectionFactor *line_f = new LineProjectionFactor(pts_s, pts_e, para_Ex_Pose[0]);
-                    ResidualBlockInfo* residual_block_info = new ResidualBlockInfo(line_f, loss_function,
-                                                                                   vector<double*>{para_Pose[0], para_Line[line_feature_index]},
-                                                                                   vector<int>{0,1});
-                    marginalization_info->addResidualBlockInfo(residual_block_info);
-                }
-            }
-        }
-
 
         TicToc t_pre_margin;
 
@@ -1285,15 +1226,15 @@ void Estimator::slideWindow()
     {
         if (frame_count == WINDOW_SIZE)
         {
-            for (unsigned int i = 0; i < dt_buf[frame_count].size(); i++)//这一部分和预积分有关
+            for (unsigned int i = 0; i < dt_buf[frame_count].size(); i++)
             {
-                double tmp_dt = dt_buf[frame_count][i];//最新帧的时间、加速度和角速度
+                double tmp_dt = dt_buf[frame_count][i];
                 Vector3d tmp_linear_acceleration = linear_acceleration_buf[frame_count][i];
                 Vector3d tmp_angular_velocity = angular_velocity_buf[frame_count][i];
 
-                pre_integrations[frame_count - 1]->push_back(tmp_dt, tmp_linear_acceleration, tmp_angular_velocity);//将最新帧的时间间隔、加速度、角度加入次新帧的预积分中
+                pre_integrations[frame_count - 1]->push_back(tmp_dt, tmp_linear_acceleration, tmp_angular_velocity);
 
-                dt_buf[frame_count - 1].push_back(tmp_dt);//将最新帧的时间间隔、加速度和角速度等存入次新帧
+                dt_buf[frame_count - 1].push_back(tmp_dt);
                 linear_acceleration_buf[frame_count - 1].push_back(tmp_linear_acceleration);
                 angular_velocity_buf[frame_count - 1].push_back(tmp_angular_velocity);
             }
@@ -1306,7 +1247,7 @@ void Estimator::slideWindow()
             Bgs[frame_count - 1] = Bgs[frame_count];
 
             delete pre_integrations[WINDOW_SIZE];
-            pre_integrations[WINDOW_SIZE] = new IntegrationBase{acc_0, gyr_0, Bas[WINDOW_SIZE], Bgs[WINDOW_SIZE]};//删除最新帧的预积分
+            pre_integrations[WINDOW_SIZE] = new IntegrationBase{acc_0, gyr_0, Bas[WINDOW_SIZE], Bgs[WINDOW_SIZE]};
 
             dt_buf[WINDOW_SIZE].clear();
             linear_acceleration_buf[WINDOW_SIZE].clear();
@@ -1323,7 +1264,6 @@ void Estimator::slideWindowNew()
 {
     sum_of_front++;
     f_manager.removeFront(frame_count);
-    line_f_manager.removeFront(frame_count);//移除线特征
 }
 
 //滑动窗口边缘化最老帧时处理特征点被观测的帧号
@@ -1333,7 +1273,8 @@ void Estimator::slideWindowOld()
     sum_of_back++;
 
     bool shift_depth = solver_flag == NON_LINEAR ? true : false;
-    if (shift_depth) {
+    if (shift_depth)
+    {
         Matrix3d R0, R1;
         Vector3d P0, P1;
         //back_R0、back_P0为窗口中最老帧的位姿
@@ -1343,11 +1284,11 @@ void Estimator::slideWindowOld()
         P0 = back_P0 + back_R0 * tic[0];
         P1 = Ps[0] + Rs[0] * tic[0];
         f_manager.removeBackShiftDepth(R0, P0, R1, P1);//如果这个特征点的开始帧不是最老帧，则特征点所有帧数减一，如果是，则通过三维变换变换到下一帧上去
-    } else
+    }
+    else
         f_manager.removeBack();
-
-    line_f_manager.removeBack();//因为线特征没有深度的概念，因此可以直接移除
 }
+
 /**
  * @brief   进行重定位
  * @optional    
