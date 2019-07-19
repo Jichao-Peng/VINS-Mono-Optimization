@@ -4,7 +4,7 @@
 
     <node name="benchmark_publisher" pkg="benchmark_publisher" type="benchmark_publisher" output="screen">
         <param name="data_name" type="string" value="$(find benchmark_publisher)/config/$(arg sequence_name)/data.csv" />
-        <remap from="~estimated_odometry" to="/vins_estimator/odometry" />
+        <remap from="~estimated_odometry" to="/line_vins_estimator/odometry" />
     </node>
 <!--
     <node pkg="rosbag" type="play" name="player" output="log" 
