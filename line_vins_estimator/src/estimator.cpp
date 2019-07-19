@@ -1103,10 +1103,12 @@ void Estimator::optimization()
             int line_feature_index = -1;
             for(auto &it_per_id : line_f_manager.line_feature)
             {
+                it_per_id.used_num = it_per_id.line_feature_per_frame.size();
                 if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))//因为在vector2double里面取para_Line的时候加了这个条件，所以这里必须也要加
                     continue;
 
                 ++line_feature_index;
+
                 if(it_per_id.start_frame == 0)
                 {
                     Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
