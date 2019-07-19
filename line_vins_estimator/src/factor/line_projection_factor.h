@@ -34,8 +34,8 @@ public:
 
 
 
-    Eigen::Vector3d Lw_n;
-    Eigen::Vector3d Lw_d;
+//    Eigen::Vector3d Lw_n;
+//    Eigen::Vector3d Lw_d;
     Eigen::Vector3d pts_s, pts_e;
     double *para_Ex_Pose;
 
