@@ -242,7 +242,9 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
         }
 
         TicToc t_margin;
+        //ROS_DEBUG("num of line feature before slideWindow: %d", line_f_manager.getFeatureCount());
         slideWindow();
+        //ROS_DEBUG("num of line feature after slideWindow: %d", line_f_manager.getFeatureCount());
         f_manager.removeFailures();
         ROS_DEBUG("marginalization costs: %fms", t_margin.toc());
         // prepare output of VINS
@@ -594,8 +596,13 @@ void Estimator::solveOdometry()
     if (solver_flag == NON_LINEAR)
     {
         TicToc t_tri;
+
         f_manager.triangulate(Ps, tic, ric);
+        //ROS_DEBUG("num of line feature before triangulate: %d", line_f_manager.getFeatureCount());
         line_f_manager.line_triangulate(Ps, tic, ric);
+        //ROS_DEBUG("num of line feature after triangulate: %d", line_f_manager.getFeatureCount());
+
+
         ROS_DEBUG("triangulation costs %f", t_tri.toc());
         optimization();
     }
@@ -1339,7 +1346,10 @@ void Estimator::slideWindowNew()
 {
     sum_of_front++;
     f_manager.removeFront(frame_count);
+
+    //ROS_DEBUG("num of line feature before removeFront: %d", line_f_manager.getFeatureCount());
     line_f_manager.removeFront(frame_count);//移除线特征
+    //ROS_DEBUG("num of line feature after removeFront: %d", line_f_manager.getFeatureCount());
 }
 
 //滑动窗口边缘化最老帧时处理特征点被观测的帧号
@@ -1362,7 +1372,9 @@ void Estimator::slideWindowOld()
     } else
         f_manager.removeBack();
 
+    //ROS_DEBUG("num of line feature before removeBack: %d", line_f_manager.getFeatureCount());
     line_f_manager.removeBack();//因为线特征没有深度的概念，因此可以直接移除
+    //ROS_DEBUG("num of line feature after removeBack: %d", line_f_manager.getFeatureCount());
 }
 /**
  * @brief   进行重定位

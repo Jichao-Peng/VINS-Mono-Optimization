@@ -219,7 +219,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
         feature_points->channels.push_back(start_y_of_line);
         feature_points->channels.push_back(end_x_of_line);
         feature_points->channels.push_back(end_y_of_line);
-        cout<<"the num of line is "<<feature_points->channels[5].values.size()<<endl;
+        //cout<<"the num of line is "<<feature_points->channels[5].values.size()<<endl;
         ROS_DEBUG("publish %f, at %f", feature_points->header.stamp.toSec(), ros::Time::now().toSec());
 
         // skip the first image; since no optical speed on frist image
