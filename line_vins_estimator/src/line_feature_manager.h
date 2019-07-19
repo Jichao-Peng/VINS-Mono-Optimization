@@ -50,6 +50,8 @@ public:
 
     vector<double> line;
     int used_num;
+    int solve_flag; // 0 haven't solve yet; 1 solve succ; 2 solve fail;
+
 };
 
 class LineFeatureManager
