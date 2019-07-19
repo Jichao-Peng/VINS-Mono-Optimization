@@ -66,12 +66,14 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 
     //计算残差
     Eigen::Map<Eigen::Vector2d> residual(residuals);
+
 #ifdef UNIT_SPHERE_ERROR
     residual =  tangent_base * (pts_camera_j.normalized() - pts_j.normalized());
 #else
     residual = Eigen::Vector2d(pts_s.dot(line_un), pts_e.dot(line_un))/line_un.head(2).norm();
 #endif
     residual = sqrt_info*residual;
+    //std::cout<<"residual"<<std::endl<<residual<<std::endl;
 
     //计算jacobians
     if (jacobians)
@@ -102,9 +104,12 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 #else   //谢论文
         reduce_1 << (u1*l2*l2 - l1*l2*v1 - l1*l3)/l1l2_23, (v1*l1*l1 - l1*l2*u1 - l2*l3)/l1l2_23, 1/line_un.head(2).norm(),
                 (u2*l2*l2 - l1*l2*v2 - l1*l3)/l1l2_23, (v2*l1*l1 - l1*l1*v2 - l2*l3)/l1l2_23, 1/line_un.head(2).norm();
+        //std::cout<<"reduce_1"<<std::endl<<reduce_1<<std::endl;
         reduce_2.setZero();
         reduce_2.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();
+        //std::cout<<"reduce_2"<<std::endl<<reduce_2<<std::endl;
         reduce = reduce_1*reduce_2;
+        //std::cout<<"reduce"<<std::endl<<reduce<<std::endl;
 #endif
         reduce = sqrt_info*reduce;
 
@@ -133,6 +138,7 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 
             jacobian_pose_i.leftCols<6>() = reduce*jaco_i;
             jacobian_pose_i.rightCols<1>().setZero();//7是占位，其实最后一个为0
+            //std::cout<<"jacobian_pose_i"<<std::endl<<jacobian_pose_i<<std::endl;
         }
 
         if (jacobians[1])
@@ -155,8 +161,9 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
             jaco_i.block<3, 1>(3, 2) = -w2*U1;
             jaco_i.block<3, 1>(0, 4) = -w2*U1;
             jaco_i.block<3, 1>(3, 4) = w1*U2;
-
+            //std::cout<<"jaco_i"<<std::endl<<jaco_i<<std::endl;
             jacobian_line = reduce*jaco_i;
+            //std::cout<<"jacobian_line"<<std::endl<<jacobian_line<<std::endl;
         }
 //        if (jacobians[2])
 //        {

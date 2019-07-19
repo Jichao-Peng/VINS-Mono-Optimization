@@ -6,15 +6,12 @@ void ResidualBlockInfo::Evaluate()
 
     std::vector<int> block_sizes = cost_function->parameter_block_sizes();
 
-    for(auto b:block_sizes)
-        std::cout<<b<<" ";
-    std::cout<<std::endl;
+//    for(auto b:block_sizes)
+//        std::cout<<b<<" ";
+//    std::cout<<std::endl;
 
-
-
-    raw_jacobians = new double *[block_sizes.size()];
+    raw_jacobians = new double *[block_sizes.size()];//指针数组
     jacobians.resize(block_sizes.size());
-
     for (int i = 0; i < static_cast<int>(block_sizes.size()); i++)
     {
         jacobians[i].resize(cost_function->num_residuals(), block_sizes[i]);//jacobians是matrix类型，resize之后会变成 残差数量×优化变量数量 大小的雅克比矩阵
@@ -23,23 +20,10 @@ void ResidualBlockInfo::Evaluate()
     }
     cost_function->Evaluate(parameter_blocks.data(), residuals.data(), raw_jacobians);//这里通过多态实现evaluate的时候计算不同的残差和雅克比矩阵
 
-    //std::vector<int> tmp_idx(block_sizes.size());
-    //Eigen::MatrixXd tmp(dim, dim);
-    //for (int i = 0; i < static_cast<int>(parameter_blocks.size()); i++)
-    //{
-    //    int size_i = localSize(block_sizes[i]);
-    //    Eigen::MatrixXd jacobian_i = jacobians[i].leftCols(size_i);
-    //    for (int j = 0, sub_idx = 0; j < static_cast<int>(parameter_blocks.size()); sub_idx += block_sizes[j] == 7 ? 6 : block_sizes[j], j++)
-    //    {
-    //        int size_j = localSize(block_sizes[j]);
-    //        Eigen::MatrixXd jacobian_j = jacobians[j].leftCols(size_j);
-    //        tmp_idx[j] = sub_idx;
-    //        tmp.block(tmp_idx[i], tmp_idx[j], size_i, size_j) = jacobian_i.transpose() * jacobian_j;
-    //    }
-    //}
-    //Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saes(tmp);
-    //std::cout << saes.eigenvalues() << std::endl;
-    //ROS_ASSERT(saes.eigenvalues().minCoeff() >= -1e-6);
+//    if(block_sizes[1] == 5)
+//    {
+//        std::cout<<"j1"<<std::endl<<jacobians[0]<<std::endl<<"j2"<<std::endl<<jacobians[1]<<std::endl;
+//    }
 
     if (loss_function)//先验和IMU预积分都没有核函数，视觉参差添加了核函数
     {
@@ -141,7 +125,7 @@ int MarginalizationInfo::localSize(int size) const
 {
     //return size == 7 ? 6 : size;
     if(size == 7)
-        return 5;
+        return 6;
     else if(size == 5)
         return 4;
     return size;
@@ -162,33 +146,56 @@ void* ThreadsConstructA(void* threadsstruct)
         {
             int idx_i = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[i])];
             int size_i = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[i])];
+//            if (size_i == 7)
+//                size_i = 6;
+//            else if(size_i == 5)
+//                size_i = 4;
+//            Eigen::MatrixXd jacobian_i = it->jacobians[i].leftCols(size_i);//左边size_i列，不要最后一维
+
             Eigen::MatrixXd jacobian_i;
-            //std::cout<<it->jacobians[i].rows()<<" "<<it->jacobians[i].cols()<<std::endl;
-            if (size_i == 5)//正交坐标系
+            if(size_i == 5)
             {
                 size_i = 4;
-                jacobian_i.resize(it->jacobians[i].rows(), 4);
-                jacobian_i << it->jacobians[i].leftCols(3), it->jacobians[i].leftCols(1);
+                jacobian_i.resize(it->jacobians[i].rows(),4);
+                jacobian_i << it->jacobians[i].leftCols(3),it->jacobians[i].rightCols(1);
+            }
+            else if (size_i == 7)
+            {
+                size_i = 6;
+                jacobian_i = it->jacobians[i].leftCols(size_i);//左边size_i列，不要最后一维
             }
             else
             {
-                if (size_i == 7)
-                    size_i = 6;
-                jacobian_i = it->jacobians[i].leftCols(size_i);//左边size_i列，不要最后一维
-
-                //std::cout<<it->jacobians[i]<<std::endl;
+                jacobian_i = it->jacobians[i];
             }
-
 
             for (int j = i; j < static_cast<int>(it->parameter_blocks.size()); j++)
             {
                 int idx_j = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[j])];
                 int size_j = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[j])];
-                if (size_j == 7)
-                    size_j = 6;
-                else if(size_j == 5)
+//                if (size_j == 7)
+//                    size_j = 6;
+//                else if(size_j == 5)
+//                    size_j = 4;
+//                Eigen::MatrixXd jacobian_j = it->jacobians[j].leftCols(size_j);
+
+                Eigen::MatrixXd jacobian_j;
+                if(size_j == 5)
+                {
                     size_j = 4;
-                Eigen::MatrixXd jacobian_j = it->jacobians[j].leftCols(size_j);
+                    jacobian_j.resize(it->jacobians[j].rows(),4);
+                    jacobian_j << it->jacobians[j].leftCols(3),it->jacobians[j].rightCols(1);
+                }
+                else if (size_j == 7)
+                {
+                    size_j = 6;
+                    jacobian_j = it->jacobians[j].leftCols(size_j);//左边size_i列，不要最后一维
+                }
+                else
+                {
+                    jacobian_j = it->jacobians[j];
+                }
+
                 if (i == j)
                     p->A.block(idx_i, idx_j, size_i, size_j) += jacobian_i.transpose() * jacobian_j;
                 else
@@ -202,6 +209,7 @@ void* ThreadsConstructA(void* threadsstruct)
     }
     return threadsstruct;
 }
+
 
 //多线程构造先验项舒尔补AX=b的结构，计算Jacobian和残差
 void MarginalizationInfo::marginalize()
@@ -240,6 +248,15 @@ void MarginalizationInfo::marginalize()
     pthread_t tids[NUM_THREADS];
     ThreadsStruct threadsstruct[NUM_THREADS];
     int i = 0;
+
+    //显示所有的雅克比矩阵
+//    for(auto it : factors)
+//    {
+//        std::cout<<std::endl<<it->jacobians.size()<<std::endl;
+//        for(auto j:it->jacobians)
+//            std::cout<<j<<std::endl;
+//    }
+
     for (auto it : factors)//将各个残差块的雅克比矩阵分配到各个线程中去
     {
         threadsstruct[i].sub_factors.push_back(it);
