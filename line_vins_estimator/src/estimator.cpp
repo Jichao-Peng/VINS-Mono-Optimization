@@ -143,7 +143,8 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
     ROS_DEBUG("new image coming ------------------------------------------");
     ROS_DEBUG("Adding feature points %lu", image.size());
 
-    line_f_manager.addFeature(frame_count, line_image, td);
+    if(solver_flag == NON_LINEAR)
+        line_f_manager.addFeature(frame_count, line_image, td);
     //添加之前检测到的特征点到feature容器中，计算每一个点跟踪的次数，以及它的视差
     //通过检测两帧之间的视差决定次新帧是否作为关键帧
     if (f_manager.addFeatureCheckParallax(frame_count, image, td))//这个函数返回的就是这一帧image是否为关键帧
@@ -921,6 +922,7 @@ void Estimator::optimization()
 
     //添加线段视觉残差
     int line_feature_index = -1;
+    bool debug_flag = true;
     for (auto &it_per_id : line_f_manager.line_feature)//遍历滑窗内所有的空间点
     {
         it_per_id.used_num = it_per_id.line_feature_per_frame.size();
@@ -929,6 +931,8 @@ void Estimator::optimization()
 
         ++line_feature_index;
         int imu_j = it_per_id.start_frame-1;
+
+
         for(auto &it_per_frame : it_per_id.line_feature_per_frame)
         {
             imu_j++;
@@ -937,6 +941,10 @@ void Estimator::optimization()
             Vector3d pts_e = it_per_frame.pts_e;
             LineProjectionFactor *line_f = new LineProjectionFactor(pts_s, pts_e, para_Ex_Pose[0]);
             problem.AddResidualBlock(line_f, loss_function, para_Pose[imu_j], para_Line[line_feature_index]);
+            if(debug_flag) {
+                ROS_DEBUG("!!!add line residual");
+                debug_flag = false;
+            }
         }
     }
 
@@ -1091,6 +1099,7 @@ void Estimator::optimization()
 
         //3、将被第零帧观测到的所有普吕克之间，添加到marginalization_info中
         {
+            bool debug_flag = true;
             int line_feature_index = -1;
             for(auto &it_per_id : line_f_manager.line_feature)
             {
@@ -1098,7 +1107,6 @@ void Estimator::optimization()
                     continue;
 
                 ++line_feature_index;
-
                 if(it_per_id.start_frame == 0)
                 {
                     Vector3d pts_s = it_per_id.line_feature_per_frame[0].pts_s;
@@ -1108,6 +1116,10 @@ void Estimator::optimization()
                                                                                    vector<double*>{para_Pose[0], para_Line[line_feature_index]},
                                                                                    vector<int>{0,1});
                     marginalization_info->addResidualBlockInfo(residual_block_info);
+                    if(debug_flag) {
+                        ROS_DEBUG("---marginalize line info");
+                        debug_flag = false;
+                    }
                 }
             }
         }

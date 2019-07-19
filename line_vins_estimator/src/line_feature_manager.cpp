@@ -25,6 +25,8 @@ void LineFeatureManager::removeFailures() {};
 
 void LineFeatureManager::addFeature(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 4, 1>>>> &line_image, double td)
 {
+    ROS_DEBUG("input line feature: %d", (int)line_image.size());
+    ROS_DEBUG("num of line feature: %d", getFeatureCount());
     for(auto &id_lines : line_image)//遍历这一帧里面所有的线段
     {
         LineFeaturePerFrame line_f_per_fra(id_lines.second[0].second, td);
