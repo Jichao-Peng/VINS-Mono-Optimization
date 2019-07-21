@@ -188,18 +188,43 @@ void PoseGraph::addKeyFrame(KeyFrame* cur_kf, bool flag_detect_loop)
         ofstream loop_path_file(VINS_RESULT_PATH, ios::app);
         loop_path_file.setf(ios::fixed, ios::floatfield);
         loop_path_file.precision(0);
-        loop_path_file << cur_kf->time_stamp * 1e9 << ",";
+        loop_path_file << cur_kf->time_stamp << " ";//* 1e9 << " ";
         loop_path_file.precision(5);
-        loop_path_file  << P.x() << ","
-              << P.y() << ","
-              << P.z() << ","
-              << Q.w() << ","
-              << Q.x() << ","
-              << Q.y() << ","
-              << Q.z() << ","
-              << endl;
+        loop_path_file
+              << P.x() << " "
+              << P.y() << " "
+              << P.z() << " "
+              << Q.w() << " "
+              << Q.x() << " "
+              << Q.y() << " "
+              << Q.z()
+              << endl;//补成17个是为了计算evo用的
         loop_path_file.close();
     }
+
+//    //4.688319,-1.786938,0.783338,0.534108,-0.153029,-0.827383,-0.082152
+//    Quaterniond Q_start(0.534108,-0.153029,-0.827383,-0.082152);
+//    Quaterniond Q_trans = (Q_start*Q).normalized();
+//    Vector3d P_start(4.688319,-1.786938,0.783338);
+//    Vector3d P_trans = P_start+Q_start.inverse()*P;
+//    if (SAVE_LOOP_PATH)
+//    {
+//        ofstream loop_path_file(VINS_RESULT_PATH, ios::app);
+//        loop_path_file.setf(ios::fixed, ios::floatfield);
+//        loop_path_file.precision(0);
+//        loop_path_file << cur_kf->time_stamp << " ";//* 1e9 << ",";
+//        loop_path_file.precision(5);
+//        loop_path_file
+//                << P_trans.x() << " "
+//                << P_trans.y() << " "
+//                << P_trans.z() << " "
+//                << Q_trans.w() << " "
+//                << Q_trans.x() << " "
+//                << Q_trans.y() << " "
+//                << Q_trans.z()
+//                << endl;
+//        loop_path_file.close();
+//    }
 
     //draw local connection
     if (SHOW_S_EDGE)
@@ -682,24 +707,50 @@ void PoseGraph::updatePath()
             path[(*it)->sequence].header = pose_stamped.header;
         }
 
+//        //4.688319,-1.786938,0.783338,0.534108,-0.153029,-0.827383,-0.082152
+//        Quaterniond Q_start(0.534108,-0.153029,-0.827383,-0.082152);
+//        Quaterniond Q_trans = (Q_start*Q).normalized();
+//        Vector3d P_start(4.688319,-1.786938,0.783338);
+//        Vector3d P_trans = P_start+Q_start.inverse()*P;
+//        if (SAVE_LOOP_PATH)
+//        {
+//            ofstream loop_path_file(VINS_RESULT_PATH, ios::app);
+//            loop_path_file.setf(ios::fixed, ios::floatfield);
+//            loop_path_file.precision(0);
+//            loop_path_file << (*it)->time_stamp << " ";//* 1e9 << ",";
+//            loop_path_file.precision(5);
+//            loop_path_file
+//                    << P_trans.x() << " "
+//                    << P_trans.y() << " "
+//                    << P_trans.z() << " "
+//                    << Q_trans.w() << " "
+//                    << Q_trans.x() << " "
+//                    << Q_trans.y() << " "
+//                    << Q_trans.z()
+//                    << endl;
+//            loop_path_file.close();
+//        }
         //保存闭环轨迹到VINS_RESULT_PATH
         if (SAVE_LOOP_PATH)
         {
             ofstream loop_path_file(VINS_RESULT_PATH, ios::app);
             loop_path_file.setf(ios::fixed, ios::floatfield);
             loop_path_file.precision(0);
-            loop_path_file << (*it)->time_stamp * 1e9 << ",";
+            loop_path_file << (*it)->time_stamp << " ";//* 1e9 << " ";
             loop_path_file.precision(5);
-            loop_path_file  << P.x() << ","
-                  << P.y() << ","
-                  << P.z() << ","
-                  << Q.w() << ","
-                  << Q.x() << ","
-                  << Q.y() << ","
-                  << Q.z() << ","
-                  << endl;
+            loop_path_file
+                    << P.x() << " "
+                    << P.y() << " "
+                    << P.z() << " "
+                    << Q.w() << " "
+                    << Q.x() << " "
+                    << Q.y() << " "
+                    << Q.z()
+                    << endl;//补成17个是为了计算evo用的
             loop_path_file.close();
         }
+
+
         //draw local connection
         if (SHOW_S_EDGE)
         {

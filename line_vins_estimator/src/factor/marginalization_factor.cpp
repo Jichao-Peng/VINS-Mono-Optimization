@@ -384,7 +384,7 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
         int idx = marginalization_info->keep_block_idx[i] - m;
         Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);//这是一个地址
         Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);//这是一个地址
-        if (size != 7)//不是位姿
+        if (size != 7)
             dx.segment(idx, size) = x - x0;
         else//是位姿
         {
