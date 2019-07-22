@@ -1046,6 +1046,7 @@ void Estimator::optimization()
                     last_marginalization_parameter_blocks,
                     drop_set);
 
+
             marginalization_info->addResidualBlockInfo(residual_block_info);
         }
 

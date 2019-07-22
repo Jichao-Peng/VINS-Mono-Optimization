@@ -296,6 +296,10 @@ void pubPointCloud(const Estimator &estimator, const std_msgs::Header &header)
     pub_margin_cloud.publish(margin_cloud);
 }
 
+void pubLine(const Estimator &estimator, const std_msgs::Header &header)
+{
+
+}
 
 void pubTF(const Estimator &estimator, const std_msgs::Header &header)
 {

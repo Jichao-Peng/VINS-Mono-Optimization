@@ -221,11 +221,24 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
     if (cur_lines.size() != 0 && !cur_ldesc.empty())
     {
         vector<int> matches;
-        m_line_feature.matchLineFeatures(cur_ldesc, forw_ldesc, matches);//matches的下标为前一帧匹配线，matches的下表对应的值为后一帧的匹配线
+        m_line_feature.matchLineFeatures(cur_ldesc, forw_ldesc, matches);//matches的下标为前一帧匹配线，matches的下标对应的值为后一帧的匹配线，没有匹配的值为-1
 
+        //对线特征进行过滤
         for(int i = 0; i<cur_lines.size(); i++)
         {
-            if(!inBorder(cur_lines[i]))
+            if(!inBorder(cur_lines[i]))//如果上一帧的线端点都位于图片的边界上，该匹配作废
+            {
+                matches[i] = -1;
+            }
+
+            //中点相差60个像素的直线剔除
+            if(!m_line_feature.judgeMidPoint(cur_lines[i], forw_lines[matches[i]]))
+            {
+                matches[i] = -1;
+            }
+
+            //角度相差30度的直线剔除
+            if(!m_line_feature.judgeAngle(cur_lines[i], forw_lines[matches[i]]))
             {
                 matches[i] = -1;
             }
@@ -237,14 +250,14 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
         {
             if(matches[i] != -1)
             {
-                line_ids_temp[matches[i]] = line_ids[i];
-                line_track_cnt_temp[matches[i]] = line_track_cnt[i];
+                line_ids_temp[matches[i]] = line_ids[i];//把上一帧的id赋值给这一帧的id
+                line_track_cnt_temp[matches[i]] = line_track_cnt[i];//把上一阵的追踪数量赋值给这一帧的id
             }
         }
         for(int i = 0; i<line_ids_temp.size(); i++)
         {
             line_track_cnt_temp[i]++;
-            if(line_ids_temp[i] == -1)
+            if(line_ids_temp[i] == -1)//如果上一帧没有匹配到的
                 line_ids_temp[i] = n_line_id;
             n_line_id++;
         }

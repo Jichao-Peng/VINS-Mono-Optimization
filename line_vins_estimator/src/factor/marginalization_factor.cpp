@@ -414,6 +414,9 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
                 }
                 else
                 {
+                    //按道理这里应该也不会运行到
+                    //因为和第一帧相关的直线会被直接marg掉，对直线的雅可比也就不存在了
+                    ROS_DEBUG("SHOULD NOT HAVE THIS");
                     jacobian.leftCols(3) = marginalization_info->linearized_jacobians.middleCols(idx, 3);
                     jacobian.rightCols(1) = marginalization_info->linearized_jacobians.middleCols(idx+3, 1);
                 }

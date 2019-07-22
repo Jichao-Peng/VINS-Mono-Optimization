@@ -18,6 +18,12 @@ class LineFeature {
 public:
     void detectLineFeatures(cv::Mat img, vector<cv::line_descriptor::KeyLine> &lines, cv::Mat &ldesc, double min_line_length);
     void matchLineFeatures(const cv::Mat &desc1, const cv::Mat &desc2, std::vector<int> &matches);
+
+    //判断是否满足直线匹配的要去i
+    bool judgeMidPoint(cv::line_descriptor::KeyLine& cur_line, cv::line_descriptor::KeyLine& fowr_line);
+    bool judgeAngle(cv::line_descriptor::KeyLine& cur_line, cv::line_descriptor::KeyLine& fowr_line);
+
+
 };
 
 
