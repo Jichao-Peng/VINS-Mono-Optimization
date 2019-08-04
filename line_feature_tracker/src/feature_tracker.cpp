@@ -130,7 +130,7 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
 
     if (forw_img.empty())
     {
-        prev_img = cur_img = forw_img = img;
+        cur_img = forw_img = img;
     }
     else
     {
@@ -157,7 +157,6 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
                 status[i] = 0;
 
         //根据status,把跟踪失败的点剔除
-        reduceVector(prev_pts, status);
         reduceVector(cur_pts, status);
         reduceVector(forw_pts, status);
         reduceVector(ids, status);
@@ -290,9 +289,6 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
 
 
     //当下一帧图像到来时，当前帧数据就成为了上一帧发布的数据
-    prev_img = cur_img;
-    prev_pts = cur_pts;
-    prev_un_pts = cur_un_pts;
 
     //把当前帧的数据forw_img、forw_pts赋给上一帧cur_img、cur_pts
     cur_img = forw_img;
@@ -342,7 +338,6 @@ void FeatureTracker::rejectWithF()
         //调用cv::findFundamentalMat对un_cur_pts和un_forw_pts计算F矩阵
         cv::findFundamentalMat(un_cur_pts, un_forw_pts, cv::FM_RANSAC, F_THRESHOLD, 0.99, status);
         int size_a = cur_pts.size();
-        reduceVector(prev_pts, status);
         reduceVector(cur_pts, status);
         reduceVector(forw_pts, status);
         reduceVector(cur_un_pts, status);

@@ -7,7 +7,6 @@
 #include <csignal>
 
 #include <opencv2/opencv.hpp>
-//#include <eigen3/Eigen/Dense>
 
 #include "camodocal/camera_models/CameraFactory.h"
 #include "camodocal/camera_models/CataCamera.h"
@@ -53,16 +52,15 @@ class FeatureTracker
     cv::Mat mask;//图像掩码
     cv::Mat fisheye_mask;//鱼眼相机mask，用来去除边缘噪点
 
-    // prev_img是上一次发布的帧的图像数据
-    // cur_img是光流跟踪的前一帧的图像数据
-    // forw_img是光流跟踪的后一帧的图像数据
-    cv::Mat prev_img, cur_img, forw_img;
+    // cur_img是光流跟踪的前一帧的图像数据(其实这个更像是上一帧的)
+    // forw_img是光流跟踪的后一帧的图像数据（这个是当前帧的）
+    cv::Mat cur_img, forw_img;
 
     vector<cv::Point2f> n_pts;//每一帧中新提取的特征点
 
-    vector<cv::Point2f> prev_pts, cur_pts, forw_pts;
+    vector<cv::Point2f> cur_pts, forw_pts;
 
-    vector<cv::Point2f> prev_un_pts, cur_un_pts;//归一化相机坐标系下的坐标
+    vector<cv::Point2f> cur_un_pts;//归一化相机坐标系下的坐标
     
     vector<cv::Point2f> pts_velocity;//当前帧相对前一帧特征点沿x,y方向的像素移动速度
 

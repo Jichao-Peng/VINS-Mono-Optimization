@@ -77,9 +77,9 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     else
         PUB_THIS_FRAME = false;
 
-    cv_bridge::CvImageConstPtr ptr;
 
     //将图像编码8UC1转换为mono8
+    cv_bridge::CvImageConstPtr ptr;
     if (img_msg->encoding == "8UC1")
     {
         sensor_msgs::Image img;
@@ -99,6 +99,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
 
     TicToc t_r;
 
+    //TODO: 这里的双目图像怎么是这么写的？
     for (int i = 0; i < NUM_OF_CAM; i++)
     {
         ROS_DEBUG("processing camera %d", i);
