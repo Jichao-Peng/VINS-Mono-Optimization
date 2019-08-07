@@ -143,8 +143,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
     ROS_DEBUG("new image coming ------------------------------------------");
     ROS_DEBUG("Adding feature points %lu", image.size());
 
-    if (solver_flag == NON_LINEAR)
-        line_f_manager.addFeature(frame_count, line_image, td);
+    line_f_manager.addFeature(frame_count, line_image, td);
     //添加之前检测到的特征点到feature容器中，计算每一个点跟踪的次数，以及它的视差
     //通过检测两帧之间的视差决定次新帧是否作为关键帧
     if (f_manager.addFeatureCheckParallax(frame_count, image, td))//这个函数返回的就是这一帧image是否为关键帧
