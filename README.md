@@ -1,124 +1,181 @@
-# VINS-Mono-Learning
+VINS-Mono点线结合说明：
 
- VINS-Mono代码注释，仅供学习 
+这个项目是我和[lee](https://github.com/lisilin013)利用课余时间完成的，主要内容是在VINS-Mono的基础上加入了线特征，实现了点线的紧耦合优化，具体的
+说明文档可以参考[我的博客](https://blog.csdn.net/weixin_44580210/article/details/98661696)，里面会由非常详细的整个项目的介绍和结果分析，
+因为我们在完成这个项目时并没有发现由非常好的关于点线特征结合的SLAM的开源代码，因此我们尝试将代码开源，希望能和更过做SLAM的朋友交流学习～
 
-详细内容可参考微博
-[VINS-Mono论文学习与代码解读——目录与参考](https://blog.csdn.net/qq_41839222/article/details/85793998)
+项目的环境配置和VINS-Mono的一致，运行步骤为：
+```
+    roslaunch line_vins_estimator euroc_line.launch 
+    roslaunch line_vins_estimator vins_rviz.launch
+    rosbag play YOUR_PATH_TO_DATASET/MH_01_easy.bag 
+```
 
-Forked from VINS-Mono: https://github.com/HKUST-Aerial-Robotics/VINS-Mono  
-29 Dec 2017: New features: Add map merge, pose graph reuse, online temporal calibration function, and support rolling shutter camera. 
-
----
-
-# 目录
-
- [VINS-Mono论文翻译](https://blog.csdn.net/qq_41839222/article/details/85683373)
-
-[VINS-Mono代码解读——启动文件launch与参数配置文件yaml介绍](https://blog.csdn.net/qq_41839222/article/details/86564879)
+下面是VINS-Mono的原始REAMDME.md
+*****
 
 
- [VINS-Mono代码解读——各种数据结构 sensor_msgs measurements](https://blog.csdn.net/qq_41839222/article/details/86030962)
 
- [VINS-Mono代码解读——视觉跟踪](https://blog.csdn.net/qq_41839222/article/details/85797156)
 
- [VINS-Mono理论学习——IMU预积分](https://blog.csdn.net/qq_41839222/article/details/86290941)
+# VINS-Mono
+## A Robust and Versatile Monocular Visual-Inertial State Estimator
 
- [VINS-Mono代码解读——状态估计器流程](https://blog.csdn.net/qq_41839222/article/details/86293038)
+**11 Jan 2019**: An extension of **VINS**, which supports stereo cameras / stereo cameras + IMU / mono camera + IMU, is published at [VINS-Fusion](https://github.com/HKUST-Aerial-Robotics/VINS-Fusion)
 
- [VINS-Mono代码解读——视觉惯性联合初始化流程](https://blog.csdn.net/qq_41839222/article/details/88942414)
+**29 Dec 2017**: New features: Add map merge, pose graph reuse, online temporal calibration function, and support rolling shutter camera. Map reuse videos: 
 
-[VINS-Mono理论学习——视觉惯性对齐与外参标定](https://blog.csdn.net/qq_41839222/article/details/89106128)
+<a href="https://www.youtube.com/embed/WDpH80nfZes" target="_blank"><img src="http://img.youtube.com/vi/WDpH80nfZes/0.jpg" 
+alt="cla" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/embed/eINyJHB34uU" target="_blank"><img src="http://img.youtube.com/vi/eINyJHB34uU/0.jpg" 
+alt="icra" width="240" height="180" border="10" /></a>
 
- VINS-Mono代码解读——滑动窗口的边缘化与非线性优化
+VINS-Mono is a real-time SLAM framework for **Monocular Visual-Inertial Systems**. It uses an optimization-based sliding window formulation for providing high-accuracy visual-inertial odometry. It features efficient IMU pre-integration with bias correction, automatic estimator initialization, online extrinsic calibration, failure detection and recovery, loop detection, and global pose graph optimization, map merge, pose graph reuse, online temporal calibration, rolling shutter support. VINS-Mono is primarily designed for state estimation and feedback control of autonomous drones, but it is also capable of providing accurate localization for AR applications. This code runs on **Linux**, and is fully integrated with **ROS**. For **iOS** mobile implementation, please go to [VINS-Mobile](https://github.com/HKUST-Aerial-Robotics/VINS-Mobile).
 
- VINS-Mono理论学习——非线性优化
+**Authors:** [Tong Qin](http://www.qintonguav.com), [Peiliang Li](https://github.com/PeiliangLi), [Zhenfei Yang](https://github.com/dvorak0), and [Shaojie Shen](http://www.ece.ust.hk/ece.php/profile/facultydetail/eeshaojie) from the [HUKST Aerial Robotics Group](http://uav.ust.hk/)
+
+**Videos:**
+
+<a href="https://www.youtube.com/embed/mv_9snb_bKs" target="_blank"><img src="http://img.youtube.com/vi/mv_9snb_bKs/0.jpg" 
+alt="euroc" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/embed/g_wN0Nt0VAU" target="_blank"><img src="http://img.youtube.com/vi/g_wN0Nt0VAU/0.jpg" 
+alt="indoor_outdoor" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/embed/I4txdvGhT6I" target="_blank"><img src="http://img.youtube.com/vi/I4txdvGhT6I/0.jpg" 
+alt="AR_demo" width="240" height="180" border="10" /></a>
+
+EuRoC dataset;                  Indoor and outdoor performance;                         AR application;
+
+<a href="https://www.youtube.com/embed/2zE84HqT0es" target="_blank"><img src="http://img.youtube.com/vi/2zE84HqT0es/0.jpg" 
+alt="MAV platform" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/embed/CI01qbPWlYY" target="_blank"><img src="http://img.youtube.com/vi/CI01qbPWlYY/0.jpg" 
+alt="Mobile platform" width="240" height="180" border="10" /></a>
+
+ MAV application;               Mobile implementation (Video link for mainland China friends: [Video1](http://www.bilibili.com/video/av10813254/) [Video2](http://www.bilibili.com/video/av10813205/) [Video3](http://www.bilibili.com/video/av10813089/) [Video4](http://www.bilibili.com/video/av10813325/) [Video5](http://www.bilibili.com/video/av10813030/))
+
+**Related Papers**
+
+* **Online Temporal Calibration for Monocular Visual-Inertial Systems**, Tong Qin, Shaojie Shen, IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS, 2018), **best student paper award** [pdf](https://ieeexplore.ieee.org/abstract/document/8593603)
+
+* **VINS-Mono: A Robust and Versatile Monocular Visual-Inertial State Estimator**, Tong Qin, Peiliang Li, Zhenfei Yang, Shaojie Shen, IEEE Transactions on Robotics[pdf](https://ieeexplore.ieee.org/document/8421746/?arnumber=8421746&source=authoralert) 
+
+*If you use VINS-Mono for your academic research, please cite at least one of our related papers.*[bib](https://github.com/HKUST-Aerial-Robotics/VINS-Mono/blob/master/support_files/paper_bib.txt)
+
+## 1. Prerequisites
+1.1 **Ubuntu** and **ROS**
+Ubuntu  16.04.
+ROS Kinetic. [ROS Installation](http://wiki.ros.org/ROS/Installation)
+additional ROS pacakge
+```
+    sudo apt-get install ros-YOUR_DISTRO-cv-bridge ros-YOUR_DISTRO-tf ros-YOUR_DISTRO-message-filters ros-YOUR_DISTRO-image-transport
+```
+
+
+1.2. **Ceres Solver**
+Follow [Ceres Installation](http://ceres-solver.org/installation.html), remember to **make install**.
+(Our testing environment: Ubuntu 16.04, ROS Kinetic, OpenCV 3.3.1, Eigen 3.3.3) 
+
+## 2. Build VINS-Mono on ROS
+Clone the repository and catkin_make:
+```
+    cd ~/catkin_ws/src
+    git clone https://github.com/HKUST-Aerial-Robotics/VINS-Mono.git
+    cd ../
+    catkin_make
+    source ~/catkin_ws/devel/setup.bash
+```
+
+## 3. Visual-Inertial Odometry and Pose Graph Reuse on Public datasets
+Download [EuRoC MAV Dataset](http://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets). Although it contains stereo cameras, we only use one camera. The system also works with [ETH-asl cla dataset](http://robotics.ethz.ch/~asl-datasets/maplab/multi_session_mapping_CLA/bags/). We take EuRoC as the example.
+
+**3.1 visual-inertial odometry and loop closure**
+
+3.1.1 Open three terminals, launch the vins_estimator , rviz and play the bag file respectively. Take MH_01 for example
+```
+    roslaunch vins_estimator euroc.launch 
+    roslaunch vins_estimator vins_rviz.launch
+    rosbag play YOUR_PATH_TO_DATASET/MH_01_easy.bag 
+```
+(If you fail to open vins_rviz.launch, just open an empty rviz, then load the config file: file -> Open Config-> YOUR_VINS_FOLDER/config/vins_rviz_config.rviz)
+
+3.1.2 (Optional) Visualize ground truth. We write a naive benchmark publisher to help you visualize the ground truth. It uses a naive strategy to align VINS with ground truth. Just for visualization. not for quantitative comparison on academic publications.
+```
+    roslaunch benchmark_publisher publish.launch  sequence_name:=MH_05_difficult
+```
+ (Green line is VINS result, red line is ground truth). 
  
- [VINS-Mono代码解读——回环检测与重定位](https://blog.csdn.net/qq_41839222/article/details/87878550)
- 
- VINS-Mono代码解读——四自由度位姿图优化
- 
- [TUM VIO数据集介绍与尝试](https://blog.csdn.net/qq_41839222/article/details/86180964)
- 
-  [Realsense D435i如何拿到IMU数据并顺利运行VINS-Mono](https://blog.csdn.net/qq_41839222/article/details/86552367)
+3.1.3 (Optional) You can even run EuRoC **without extrinsic parameters** between camera and IMU. We will calibrate them online. Replace the first command with:
+```
+    roslaunch vins_estimator euroc_no_extrinsic_param.launch
+```
+**No extrinsic parameters** in that config file.  Waiting a few seconds for initial calibration. Sometimes you cannot feel any difference as the calibration is done quickly.
 
----
+**3.2 map merge**
+
+After playing MH_01 bag, you can continue playing MH_02 bag, MH_03 bag ... The system will merge them according to the loop closure.
+
+**3.3 map reuse**
+
+3.3.1 map save
+
+Set the **pose_graph_save_path** in the config file (YOUR_VINS_FOLEDER/config/euroc/euroc_config.yaml). After playing MH_01 bag, input **s** in vins_estimator terminal, then **enter**. The current pose graph will be saved. 
+
+3.3.2 map load
+
+Set the **load_previous_pose_graph** to 1 before doing 3.1.1. The system will load previous pose graph from **pose_graph_save_path**. Then you can play MH_02 bag. New sequence will be aligned to the previous pose graph.
+
+## 4. AR Demo
+4.1 Download the [bag file](https://www.dropbox.com/s/s29oygyhwmllw9k/ar_box.bag?dl=0), which is collected from HKUST Robotic Institute. For friends in mainland China, download from [bag file](https://pan.baidu.com/s/1geEyHNl).
+
+4.2 Open three terminals, launch the ar_demo, rviz and play the bag file respectively.
+```
+    roslaunch ar_demo 3dm_bag.launch
+    roslaunch ar_demo ar_rviz.launch
+    rosbag play YOUR_PATH_TO_DATASET/ar_box.bag 
+```
+We put one 0.8m x 0.8m x 0.8m virtual box in front of your view. 
+
+## 5. Run with your device 
+
+Suppose you are familiar with ROS and you can get a camera and an IMU with raw metric measurements in ROS topic, you can follow these steps to set up your device. For beginners, we highly recommend you to first try out [VINS-Mobile](https://github.com/HKUST-Aerial-Robotics/VINS-Mobile) if you have iOS devices since you don't need to set up anything.
+
+5.1 Change to your topic name in the config file. The image should exceed 20Hz and IMU should exceed 100Hz. Both image and IMU should have the accurate time stamp. IMU should contain absolute acceleration values including gravity.
+
+5.2 Camera calibration:
+
+We support the [pinhole model](http://docs.opencv.org/2.4.8/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html) and the [MEI model](http://www.robots.ox.ac.uk/~cmei/articles/single_viewpoint_calib_mei_07.pdf). You can calibrate your camera with any tools you like. Just write the parameters in the config file in the right format. If you use rolling shutter camera, please carefully calibrate your camera, making sure the reprojection error is less than 0.5 pixel.
+
+5.3 **Camera-Imu extrinsic parameters**:
+
+If you have seen the config files for EuRoC and AR demos, you can find that we can estimate and refine them online. If you familiar with transformation, you can figure out the rotation and position by your eyes or via hand measurements. Then write these values into config as the initial guess. Our estimator will refine extrinsic parameters online. If you don't know anything about the camera-IMU transformation, just ignore the extrinsic parameters and set the **estimate_extrinsic** to **2**, and rotate your device set at the beginning for a few seconds. When the system works successfully, we will save the calibration result. you can use these result as initial values for next time. An example of how to set the extrinsic parameters is in[extrinsic_parameter_example](https://github.com/HKUST-Aerial-Robotics/VINS-Mono/blob/master/config/extrinsic_parameter_example.pdf)
+
+5.4 **Temporal calibration**:
+Most self-made visual-inertial sensor sets are unsynchronized. You can set **estimate_td** to 1 to online estimate the time offset between your camera and IMU.  
+
+5.5 **Rolling shutter**:
+For rolling shutter camera (carefully calibrated, reprojection error under 0.5 pixel), set **rolling_shutter** to 1. Also, you should set rolling shutter readout time **rolling_shutter_tr**, which is from sensor datasheet(usually 0-0.05s, not exposure time). Don't try web camera, the web camera is so awful.
+
+5.6 Other parameter settings: Details are included in the config file.
+
+5.7 Performance on different devices: 
+
+(global shutter camera + synchronized high-end IMU, e.g. VI-Sensor) > (global shutter camera + synchronized low-end IMU) > (global camera + unsync high frequency IMU) > (global camera + unsync low frequency IMU) > (rolling camera + unsync low frequency IMU). 
+
+## 6. Docker Support
+
+To further facilitate the building process, we add docker in our code. Docker environment is like a sandbox, thus makes our code environment-independent. To run with docker, first make sure [ros](http://wiki.ros.org/ROS/Installation) and [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/) are installed on your machine. Then add your account to `docker` group by `sudo usermod -aG docker $YOUR_USER_NAME`. **Relaunch the terminal or logout and re-login if you get `Permission denied` error**, type:
+```
+cd ~/catkin_ws/src/VINS-Mono/docker
+make build
+./run.sh LAUNCH_FILE_NAME   # ./run.sh euroc.launch
+```
+Note that the docker building process may take a while depends on your network and machine. After VINS-Mono successfully started, open another terminal and play your bag file, then you should be able to see the result. If you need modify the code, simply run `./run.sh LAUNCH_FILE_NAME` after your changes.
 
 
-## VINS介绍：
+## 7. Acknowledgements
+We use [ceres solver](http://ceres-solver.org/) for non-linear optimization and [DBoW2](https://github.com/dorian3d/DBoW2) for loop detection, and a generic [camera model](https://github.com/hengli/camodocal).
 
-VINS是一种具有鲁棒性和通用性的单目视觉惯性状态估计器。  
-该算法主要有以下几个模块：  
- 1. 预处理  
-&emsp; &emsp;1）图像特征光流跟踪  
-&emsp; &emsp;2）IMU数据预积分  
- 2. 初始化  
-&emsp; &emsp;1）纯视觉Sfm  
-&emsp; &emsp;2）Sfm与IMU预积分的松耦合  
- 3. 基于滑动窗口的非线性优化  
- 4. 回环检测与重定位  
- 5. 四自由度位姿图优化  
+## 8. Licence
+The source code is released under [GPLv3](http://www.gnu.org/licenses/) license.
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190104194533165.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxODM5MjIy,size_16,color_FFFFFF,t_70)
+We are still working on improving the code reliability. For any technical issues, please contact Tong QIN <tong.qinATconnect.ust.hk> or Peiliang LI <pliapATconnect.ust.hk>.
 
-----
-
-## rqt_graph
-
-node only
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190108100859579.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxODM5MjIy,size_16,color_FFFFFF,t_70)
-
-
-node all![在这里插入图片描述](https://img-blog.csdnimg.cn/20190108102632561.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxODM5MjIy,size_16,color_FFFFFF,t_70)
-
----
-
-## 代码的文件目录
-
-1、ar_demo：一个ar应用demo  
-2、benchmark\_publisher：接收并发布数据集的基准值  
-3、camera\_model  
-&emsp; &emsp;calib：相机参数标定  
-&emsp; &emsp;camera\_models：各种相机模型类  
-&emsp; &emsp;chessboard：检测棋盘格  
-&emsp; &emsp;gpl  
-&emsp; &emsp;sparse\_graph  
-&emsp; &emsp;intrinsic\_calib.cc：相机标定模块main函数  
-4、config：系统配置文件存放处  
-5、feature\_trackers：  
-&emsp; &emsp;feature\_tracker\_node.cpp	ROS 节点函数，回调函数  
-&emsp; &emsp;feature\_tracker.cpp	图像特征光流跟踪
-6、pose\_graph：  
-&emsp; &emsp;keyframe.cpp	关键帧选取、描述子计算与匹配   
-&emsp; &emsp;pose\_graph.cpp 位姿图的建立与图优化  
-&emsp; &emsp;pose\_graph\_node.cpp	ROS 节点函数，回调函数，主线程  
-7、support\_files：帮助文档、Bow字典、Brief模板文件  
-8、vins\_estimator   
-&emsp; &emsp;factor：实现IMU、camera等残差模型  
-&emsp; &emsp;initial：系统初始化，外参标定，SFM  
-&emsp; &emsp;utility：相机可视化，四元数等数据转换  
-&emsp;&emsp; estimator.cpp：紧耦合的VIO状态估计器实现  
-&emsp;&emsp; estimator\_node.cpp：ROS 节点函数，回调函数， 主线程  
-&emsp; &emsp;feature\_manager.cpp：特征点管理，三角化，关键帧等  
-&emsp; &emsp;parameters.cpp：读取参数  
-
---------------------- 
-
-参考笔记：
-
-VINS论文推导及代码解析 by 崔华坤
-
-[VINS技术路线与代码详解](https://blog.csdn.net/wangshuailpp/article/details/78461171) by 五行缺帅wangshuailpp
-
-[VINS-Mono 学习笔记](https://zhuanlan.zhihu.com/p/36161028) by 童哲航
-
-[VINS-Mono 代码解读](https://blog.csdn.net/u012871872/article/details/78128087?locationNum=8&fps=1) by  Rain-XIA
-
-[VINS-mono详细解读](https://www.cnblogs.com/ilekoaiq/p/8836970.html)  by 极品巧克力
-
-参考VINS代码注释：
-
-https://github.com/castiel520/VINS-Mono	by [castiel520](https://github.com/castiel520)
-
-https://github.com/QingSimon/VINS-Mono-code-annotation	by [QingSimon](https://github.com/QingSimon)
-
-----
+For commercial inquiries, please contact Shaojie SHEN <eeshaojieATust.hk>
