@@ -191,24 +191,19 @@ void LineFeatureManager::line_triangulate(Eigen::Matrix<double, 3, 1> *Ps, Vecto
         //计算结束帧上直线构成的平面
         Vector3d pi_xyz_1 = it_per_id.line_feature_per_frame.back().pts_s.cross(it_per_id.line_feature_per_frame.back().pts_e);//起始点与终止点叉乘
         double pi_w_1 = pi_xyz_1.dot(t1);//pi_xyz和相机中心点成
-//        cout<<pi_xyz_0<<" "<<pi_xyz_1<<endl;
 
         Vector4d pi_0, pi_1;
         pi_0 << pi_xyz_0.x(), pi_xyz_0.y(), pi_xyz_0.z(), pi_w_0;//构建前后两帧pi平面
         pi_1 << pi_xyz_1.x(), pi_xyz_1.y(), pi_xyz_1.z(), pi_w_1;
 
         Matrix4d matrix_pu = pi_0*pi_1.transpose() - pi_1*pi_0.transpose();
-//        cout<<matrix_pu<<endl<<endl;
-
 
         Vector3d pu_n, pu_d;
         pu_n = matrix_pu.block<3, 1>(0, 3);
         pu_d << -matrix_pu(1, 2), matrix_pu(0, 2), -matrix_pu(0, 1);
 
-//        cout<<pu_n<<" "<<pu_d<<endl;
         it_per_id.line.resize(5);
         Utility::cvtPluckerToOrthonormal(pu_n, pu_d, it_per_id.line);
-//        cout<<it_per_id.line[0]<<" "<<it_per_id.line[1]<<" "<<it_per_id.line[2]<<" "<<it_per_id.line[3]<<" "<<it_per_id.line[4]<<" "<<endl;
 
         //TODO:在点的三角化中会对求解结果有一个限制
     }

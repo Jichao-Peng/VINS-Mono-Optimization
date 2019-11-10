@@ -102,7 +102,7 @@ Config::Config()
     orb_patch_size    = 31;         // size of the patch used by the oriented BRIEF descriptor.
     orb_fast_th       = 20;         // default FAST threshold
     // LSD parameters
-    lsd_nfeatures     = 300;        // number of LSD lines detected (set to 0 if keeping all lines)
+    lsd_nfeatures     = 100;        // number of LSD lines detected (set to 0 if keeping all lines)
     lsd_refine        = 0;          // the way of refining or not the detected lines
     lsd_scale         = 1.2;        // scale of the image that will be used to find the lines
     lsd_sigma_scale   = 0.6;        // sigma for Gaussian filter

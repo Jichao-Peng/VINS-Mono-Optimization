@@ -118,7 +118,7 @@ bool LineFeature::judgeMidPoint(cv::line_descriptor::KeyLine &cur_line, cv::line
     Point2d cur_mid_point((cur_line.startPointX+cur_line.endPointX)/2, (cur_line.startPointY+cur_line.endPointY)/2);
     Point2d forw_mid_point((forw_line.startPointX+forw_line.endPointX)/2, (forw_line.startPointY+forw_line.endPointY)/2);
     double dist = sqrt(pow((cur_mid_point.x-forw_mid_point.x),2)+pow((cur_mid_point.y-forw_mid_point.y),2));
-    if(dist < 60)
+    if(dist < 30)
         return true;
     return false;
 }
@@ -129,7 +129,7 @@ bool LineFeature::judgeAngle(cv::line_descriptor::KeyLine &cur_line, cv::line_de
     double cur_theta = atan((cur_line.startPointY-cur_line.endPointY)/(cur_line.startPointX-cur_line.endPointX));
     double forw_theta = atan((forw_line.startPointY-forw_line.endPointY)/(forw_line.startPointX-forw_line.endPointX));
     double theta_diff = abs(cur_theta-forw_theta);
-    if(theta_diff<30)
+    if(theta_diff<15)
         return true;
     return false;
 }

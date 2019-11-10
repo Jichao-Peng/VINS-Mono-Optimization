@@ -223,6 +223,13 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
         m_line_feature.matchLineFeatures(cur_ldesc, forw_ldesc, matches);//matches的下标为前一帧匹配线，matches的下标对应的值为后一帧的匹配线，没有匹配的值为-1
 
         //对线特征进行过滤
+        int cnt = 0;
+        for(int i : matches)
+        {
+            if(i != -1)
+                cnt++;
+        }
+        ROS_DEBUG("line cnt before filte: %d", cnt);
         for(int i = 0; i<cur_lines.size(); i++)
         {
             if(!inBorder(cur_lines[i]))//如果上一帧的线端点都位于图片的边界上，该匹配作废
@@ -242,6 +249,14 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
                 matches[i] = -1;
             }
         }
+        //对线特征进行过滤
+        cnt = 0;
+        for(int i : matches)
+        {
+            if(i != -1)
+                cnt++;
+        }
+        ROS_DEBUG("line cnt after filte: %d", cnt);
 
         vector<int> line_ids_temp(forw_lines.size(),-1);
         vector<int> line_track_cnt_temp(forw_lines.size(),0);

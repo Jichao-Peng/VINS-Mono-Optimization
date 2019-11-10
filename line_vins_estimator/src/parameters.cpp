@@ -42,8 +42,8 @@ T readParam(ros::NodeHandle &n, std::string name)
 void readParameters(ros::NodeHandle &n)
 {
     std::string config_file;
-    //config_file = readParam<std::string>(n, "config_file");
-    config_file = "/home/leo/catkin_ws/src/VINS-Mono-Optimization/config/euroc/euroc_config.yaml";
+    config_file = readParam<std::string>(n, "config_file");
+    //config_file = "/home/leo/catkin_ws/src/VINS-Mono-Optimization/config/euroc/euroc_config.yaml";
     cv::FileStorage fsSettings(config_file, cv::FileStorage::READ);
     if(!fsSettings.isOpened())
     {
