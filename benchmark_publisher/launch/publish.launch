@@ -7,7 +7,7 @@
         <remap from="~estimated_odometry" to="/line_vins_estimator/odometry" />
     </node>
 <!--
-    <node pkg="rosbag" type="play" name="player" output="log" 
+    <node pkg="rosbag" type="play" name="player" output="log"
     args="/home/tony-ws1/bag/ijrr_euroc_mav_dataset/$(arg sequence_name)/$(arg sequence_name).bag -r 2" />
 -->
 </launch>
