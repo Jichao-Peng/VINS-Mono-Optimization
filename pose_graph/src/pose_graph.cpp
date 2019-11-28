@@ -671,12 +671,6 @@ void PoseGraph::updatePath()
     base_path.poses.clear();
     posegraph_visualization->reset();
 
-    if (SAVE_LOOP_PATH)
-    {
-        ofstream loop_path_file_tmp(VINS_RESULT_PATH, ios::out);
-        loop_path_file_tmp.close();
-    }
-
     for (it = keyframelist.begin(); it != keyframelist.end(); it++)
     {
         Vector3d P;

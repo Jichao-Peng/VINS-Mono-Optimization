@@ -12,7 +12,7 @@
        <param name="vins_folder" type="string" value="$(arg vins_path)" />
     </node>
 
-    <node name="pose_graph" pkg="pose_graph" type="pose_graph" output="log">
+    <node name="pose_graph" pkg="pose_graph" type="pose_graph" output="screen">
         <param name="config_file" type="string" value="$(arg config_path)" />
         <param name="visualization_shift_x" type="int" value="0" />
         <param name="visualization_shift_y" type="int" value="0" />
@@ -20,4 +20,8 @@
         <param name="skip_dis" type="double" value="0" />
     </node>
 
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find line_vins_estimator)/../config/vins_rviz_config.rviz" />
+
+    <include file="$(find benchmark_publisher)/launch/publish.launch">
+    </include>
 </launch>

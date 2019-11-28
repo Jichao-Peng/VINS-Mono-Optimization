@@ -860,9 +860,26 @@ void Estimator::optimization() {
         }
     }
 
-    //添加线段视觉残差
+    //添加线段视觉param block
     int line_feature_index = -1;
     bool debug_flag = true;
+    for (auto &it_per_id : line_f_manager.line_feature)//遍历滑窗内所有的空间点
+    {
+        it_per_id.used_num = it_per_id.line_feature_per_frame.size();
+        if (!(it_per_id.used_num >= 2 && it_per_id.start_frame < WINDOW_SIZE - 2))
+            continue;
+
+        ++line_feature_index;
+        // for line feature
+        ceres::LocalParameterization *line_local_parameterization = new LineLocalParameterization();
+        problem.AddParameterBlock(para_Line[line_feature_index], SIZE_LINE, line_local_parameterization); //5
+    }
+
+
+
+    //添加线段视觉残差
+    line_feature_index = -1;
+    debug_flag = true;
     for (auto &it_per_id : line_f_manager.line_feature)//遍历滑窗内所有的空间点
     {
         it_per_id.used_num = it_per_id.line_feature_per_frame.size();
@@ -875,7 +892,6 @@ void Estimator::optimization() {
 
         for (auto &it_per_frame : it_per_id.line_feature_per_frame) {
             imu_j++;
-
             Vector3d pts_s = it_per_frame.pts_s;
             Vector3d pts_e = it_per_frame.pts_e;
             LineProjectionFactor *line_f = new LineProjectionFactor(pts_s, pts_e, para_Ex_Pose[0]);
@@ -887,14 +903,6 @@ void Estimator::optimization() {
         }
     }
 
-    //-------------------------------------
-    // TODO: TESTING
-    //-------------------------------------
-    for (int i = 0; i < line_feature_index; ++i) {
-        ceres::LocalParameterization *line_local_parameterization = new LineLocalParameterization();
-        problem.AddParameterBlock(para_Line[i], SIZE_LINE, line_local_parameterization); //7
-//        problem.SetParameterization(para_Line[i], line_local_parameterization);
-    }
 
     ROS_DEBUG("visual measurement count: %d", f_m_cnt);
     ROS_DEBUG("prepare for ceres: %f", t_prepare.toc());

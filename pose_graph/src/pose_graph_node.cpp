@@ -463,6 +463,7 @@ void command()
 {
     if (!LOOP_CLOSURE)
         return;
+    ROS_INFO("Detected loop closure, now you can press S to save path.");
     while(1)
     {
         //按s保存位姿图并关闭程序
